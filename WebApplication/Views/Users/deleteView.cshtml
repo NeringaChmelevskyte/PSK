@@ -1,0 +1,39 @@
+﻿@model Application.Entities.User
+
+@{
+    ViewData["Title"] = "RemoveUserView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete User</h2>
+
+<h3>Are you sure you want to delete this user?</h3>
+<div>
+    <hr />
+    <dl class="left">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SurName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SurName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>       
+    </dl>
+    
+    <form asp-action="RemoveUser">
+        @*<input type="hidden" asp-for="Id" />*@
+        <input type="submit" value="Delete" formaction=@Url.Action("RemoveUser", "Users", new {id = Model.Id }) formmethod="post" class="btn btn-default" /> |
+        <a asp-action="AllUsers">Back to List</a>
+    </form>
+</div>

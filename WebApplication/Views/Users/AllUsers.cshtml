@@ -43,11 +43,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.IsAdmin)
             </td>
-            @*<td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>*@
+            <td>
+                @*<a asp-action="edit" asp-route-id="@item.Id">edit</a> |
+        <a asp-action="details" asp-route-id="@item.Id">details</a> |*@
+               @Html.ActionLink("delete","deleteView", "Users", new { id = item.Id })
+
+                @*<a asp-action="deleteView" asp-route-id="@item.Id">delete</a>*@
+            </td>
         </tr>
 }
     </tbody>

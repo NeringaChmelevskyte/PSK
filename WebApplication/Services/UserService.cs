@@ -52,7 +52,6 @@ namespace Application.Services
             Array.Copy(hash, 0, hashBytes, 16, 20);
             user.Password = Convert.ToBase64String(hashBytes);
             #endregion
-            user.Id = _context.Users.LastOrDefault().Id +1;
             _context.Add(user);
             _context.SaveChanges();
             return user;

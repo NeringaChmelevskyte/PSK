@@ -48,6 +48,12 @@ namespace Application.Controllers
             return RedirectToAction("AllUsers", "Users");
         }
 
+        [HttpPost]
+        public ActionResult RemoveUser(int id)
+        {
+            _us.RemoveUser(id);
+            return RedirectToAction("AllUsers", "Users");
+        }
         //[HttpPost]
         //public void Post(int id)
         //{
@@ -57,6 +63,12 @@ namespace Application.Controllers
         public IActionResult AddUserView()
         {
             return View();
+        }
+
+        public IActionResult deleteView(int? id)
+        {
+            var user= Get().Where(x => x.Id == id);
+            return View(user.SingleOrDefault());
         }
 
         public IActionResult LoginView()
