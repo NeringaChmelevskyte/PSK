@@ -12,5 +12,7 @@ namespace Application.IServices
         User AddUser(User user);
         IEnumerable<User> GetAllUsers();
         void RemoveUser(int id);
+        void UpdateUser(User user);
+
     }
 }

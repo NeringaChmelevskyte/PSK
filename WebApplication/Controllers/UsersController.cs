@@ -54,23 +54,30 @@ namespace Application.Controllers
             _us.RemoveUser(id);
             return RedirectToAction("AllUsers", "Users");
         }
-        //[HttpPost]
-        //public void Post(int id)
-        //{
-        //    _us.RemoveUser(id);
-        //}
 
+        [HttpPost]
+        public ActionResult EditUser(User user)
+        {
+            _us.UpdateUser(user);
+            return RedirectToAction("AllUsers", "Users");
+        }
+        
         public IActionResult AddUserView()
         {
             return View();
         }
 
-        public IActionResult deleteView(int? id)
+        public IActionResult DeleteView(int? id)
         {
             var user= Get().Where(x => x.Id == id);
             return View(user.SingleOrDefault());
         }
 
+        public IActionResult EditUserView(User user)
+        {
+            //var user = Get().Where(x => x.Id == id);
+            return View(user);
+        }
         public IActionResult LoginView()
         {
             return View();
