@@ -36,7 +36,7 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Surname)
-            </td>           
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
@@ -44,14 +44,16 @@
                 @Html.DisplayFor(modelItem => item.IsAdmin)
             </td>
             <td>
-                
-                @*<a asp-action="edit" asp-route-id="@item.Id">edit</a> |
-        <a asp-action="details" asp-route-id="@item.Id">details</a> |*@
-                @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, IsAdmin = item.IsAdmin })
-
-                @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id })
-
-                @*<a asp-action="deleteView" asp-route-id="@item.Id">delete</a>*@
+                @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, IsAdmin = item.IsAdmin }) 
+            </td>
+            <td>
+                @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id }) 
+            </td>
+            <td>
+                @Html.ActionLink("User Calendar", "index", "Events", new { id = item.Id }) 
+            </td>
+            <td>
+                @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
             </td>
         </tr>
 }
