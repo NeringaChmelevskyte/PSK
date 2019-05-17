@@ -1,7 +1,7 @@
 ﻿@model Application.Entities.User
 
 @{
-    ViewData["Title"] = "RemoveUserView";
+    ViewData["Title"] = "DeleteUserView";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -18,10 +18,10 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.SurName)
+            @Html.DisplayNameFor(model => model.Surname)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.SurName)
+            @Html.DisplayFor(model => model.Surname)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Email)

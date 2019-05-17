@@ -1,18 +1,18 @@
 ﻿@model Application.Entities.User
 
 @{
-    ViewData["Title"] = "AddUserView";
+    ViewData["Title"] = "EditUserView";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>AddUserView</h2>
+<h2>Edit User</h2>
 
-<h4>User</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="AddUser">
+        <form asp-action="EditUser">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" formaction=@Url.Action("AddUser", "Users") formmethod="post" class="btn btn-default" />
+                <input type="submit" value="Save" formaction=@Url.Action("EditUser", "Users", new { Id = Model.Id, Name = Model.Name, Surname = Model.Surname, Email = Model.Email, Password = Model.Password, IsAdmin = Model.IsAdmin }) formmethod="post" class="btn btn-default" />
             </div>
         </form>
     </div>
