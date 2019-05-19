@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Application.Entities
 {
+    public enum BookingTypeEnum
+    {
+        UserEvent,
+        UserTrip
+    }
+
     public class Event
     {
         [Key]
@@ -13,6 +19,7 @@ namespace Application.Entities
         [Required]
         public string Subject { get; set; }
 
+        [DisplayFormat(ConvertEmptyStringToNull = true, NullDisplayText = "")]
         public string Description { get; set; }
         [Required]
         public DateTime Start { get; set; }
