@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Application.Entities;
+using WebApplication.Models;
 
 namespace Application
 {
@@ -27,6 +28,8 @@ namespace Application
             base.OnModelCreating(modelBuilder);
 
         }
+
+        public DbSet<Application.Entities.Trip> Trip { get; set; }
 
     }
 }
