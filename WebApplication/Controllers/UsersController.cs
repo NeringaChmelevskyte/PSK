@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Application.IServices;
 using Application.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Application.Controllers
 {
@@ -64,6 +65,13 @@ namespace Application.Controllers
         
         public IActionResult AddUserView()
         {
+            var enumData = from Roles r in Enum.GetValues(typeof(Roles))
+                           select new
+                           {
+                               ID = (int)r,
+                               Title = r.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Title");
             return View();
         }
 
@@ -75,7 +83,13 @@ namespace Application.Controllers
 
         public IActionResult EditUserView(User user)
         {
-            //var user = Get().Where(x => x.Id == id);
+            var enumData = from Roles r in Enum.GetValues(typeof(Roles))
+                           select new
+                           {
+                               ID = (int)r,
+                               Title = r.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Title");
             return View(user);
         }
         public IActionResult LoginView()

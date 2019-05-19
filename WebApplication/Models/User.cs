@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Application.Entities
 {
+    public enum Roles
+    {
+        Admin,
+        Employee,
+        Organizer       
+    }
+
     public class User
     {
         public int Id { get; set; }
@@ -24,6 +28,6 @@ namespace Application.Entities
         [EmailAddress]
         [Required]
         public string Email { get; set; }
-        public bool IsAdmin { get; set; }
+        public Roles Role { get; set; }
     }
 }
