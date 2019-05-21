@@ -31,5 +31,9 @@ namespace Application
 
         public DbSet<Application.Entities.Trip> Trip { get; set; }
 
+        public DbSet<Application.Entities.Apartment> Apartment { get; set; }
+
+        public DbSet<Application.Entities.ApartmentRoom> ApartmentRoom { get; set; }
+
     }
 }
