@@ -1,4 +1,5 @@
 ﻿using Application;
+using System.Text;
 using Application.IServices;
 using Application.Services;
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Application.Entities;
 
 namespace WebApplication
 {
@@ -27,6 +31,23 @@ namespace WebApplication
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AppDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"));
             services.AddScoped<IUserService, UserService>();
+
+            services.AddAuthentication(option => {
+                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options => {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = "Musu app",
+                    ValidIssuer = "Musu app",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("BMW 530 e60 160kw"))
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
