@@ -7,6 +7,7 @@ using Application.Entities;
 using System.Security.Cryptography;
 using WebApplication.Models;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services
 {
@@ -107,10 +108,10 @@ namespace Application.Services
         public User GetUserFromToken(string token)
         {
             var t = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            if(t.ValidTo > DateTime.Now)
+            if (t.ValidTo > DateTime.Now)
             {
                 ActiveToken dbToken = _context.ActiveTokens.Where(i => i.Token == token).FirstOrDefault();
-                if(dbToken == null)
+                if (dbToken == null)
                 {
                     return null;
                 }
@@ -122,6 +123,19 @@ namespace Application.Services
             else
             {
                 return null;
+            }
+        }
+
+        public User GetUserFromRequest(HttpRequest Request)
+        {
+            string token = Request.Cookies["token"];
+            if(token == null)
+            {
+                return null;
+            }
+            else
+            {
+                return GetUserFromToken(token);
             }
         }
 

@@ -123,7 +123,7 @@ namespace Application.Controllers
         }
         public IActionResult Logout()
         {
-            var user = _us.GetUserFromToken(Request.Cookies["token"]);
+            var user = _us.GetUserFromRequest(Request);
             _us.DeleteToken(user);
             return RedirectToAction("LoginView");
         }
