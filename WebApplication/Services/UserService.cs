@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Application.IServices;
 using Application.Entities;
 using System.Security.Cryptography;
+using WebApplication.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Application.Services
 {
@@ -89,6 +91,48 @@ namespace Application.Services
                 _context.Update(user);
                 _context.SaveChanges();
             }
+        }
+
+        public void AddToken(User user, string token)
+        {
+            ActiveToken t = new ActiveToken
+            {
+                Token = token,
+                UserId = user.Id
+            };
+            _context.Add(t);
+            _context.SaveChanges();
+        }
+
+        public User GetUserFromToken(string token)
+        {
+            var t = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            if(t.ValidTo > DateTime.Now)
+            {
+                ActiveToken dbToken = _context.ActiveTokens.Where(i => i.Token == token).FirstOrDefault();
+                if(dbToken == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return _context.Users.Where(i => i.Id == dbToken.UserId).FirstOrDefault();
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void DeleteToken(User user)
+        {
+            var tokens = _context.ActiveTokens.Where(a => a.UserId == user.Id).ToList();
+            foreach(ActiveToken token in tokens)
+            {
+                _context.ActiveTokens.Remove(token);
+            }
+            _context.SaveChanges();
         }
     }
 }

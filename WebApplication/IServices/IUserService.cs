@@ -14,6 +14,9 @@ namespace Application.IServices
         User GetUser(int id);
         void RemoveUser(int id);
         void UpdateUser(User user);
+        void AddToken(User user, string token);
+        User GetUserFromToken(string token);
+        void DeleteToken(User user);
 
     }
 }
