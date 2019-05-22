@@ -11,6 +11,7 @@ namespace Application.IServices
         User LoginUser(string email, string password);
         User AddUser(User user);
         IEnumerable<User> GetAllUsers();
+        User GetUser(int id);
         void RemoveUser(int id);
         void UpdateUser(User user);
 

@@ -39,6 +39,10 @@ namespace Application.Services
         {
             return _context.Users;
         }
+        public User GetUser(int id)
+        {
+            return _context.Users.Where(i => i.Id == id).FirstOrDefault();
+        }
         public User AddUser(User user)
         {
             #region PasswordHashing
