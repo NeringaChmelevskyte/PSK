@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using WebApplication.Models;
 using Application.Entities;
+using System.Diagnostics;
 
 namespace WebApplication.Controllers
 {
@@ -155,6 +156,41 @@ namespace WebApplication.Controllers
         private bool TripExists(int id)
         {
             return _context.Trip.Any(e => e.Id == id);
+        }
+
+        
+
+        //TODO event -> trip
+        [HttpPost]
+        public JsonResult AddFlight(FlightInformation flightInformation)
+        {
+            var status = false;
+            if (flightInformation.TripId > 0)
+            {
+                
+                var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
+                if (v != null)
+                {
+                    Debug.WriteLine("If Viduje");
+                    //v.Id = flightInformation.Id;
+                    v.Id = v.Id;
+                    v.TripId = flightInformation.TripId;
+                    v.Cost = flightInformation.Cost;
+                    v.Start = flightInformation.Start;
+                    v.End = flightInformation.End;
+                    v.FlightTicketStatus = flightInformation.FlightTicketStatus;
+                    _context.Update(v);
+                }
+                else
+                {
+                    _context.Add(flightInformation);
+                }
+
+            }
+            _context.SaveChanges();
+            status = true;
+
+            return new JsonResult(status);
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Application
         }
 
         public DbSet<Application.Entities.Trip> Trip { get; set; }
+        public DbSet<FlightInformation> FlightInformation { get; set; }
 
     }
 }
