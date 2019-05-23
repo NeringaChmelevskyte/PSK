@@ -142,11 +142,26 @@ namespace Application.Services
         public void DeleteToken(User user)
         {
             var tokens = _context.ActiveTokens.Where(a => a.UserId == user.Id).ToList();
-            foreach(ActiveToken token in tokens)
+            foreach (ActiveToken token in tokens)
             {
                 _context.ActiveTokens.Remove(token);
             }
             _context.SaveChanges();
+        }
+        public List<User> GetUserListFromStringList(List<string> stringList)
+        {
+            var list = new List<User>();
+            foreach(string str in stringList)
+            {
+                var arr = str.Trim().Split(" ");
+                try
+                {
+                    var user = _context.Users.Where(x => x.Name == arr[0] && x.Surname == arr[1]).FirstOrDefault();
+                    if (user != null && !list.Contains(user)) list.Add(user);
+                }
+                catch { }
+            }
+            return list;
         }
     }
 }

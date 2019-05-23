@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Application.Entities.User>
+
+@{
+    ViewData["Title"] = "NewTrip";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Please choose people, you want to participate in your trip:</h1>
+<textarea id="textBox" style="width:40%; height: 80px;"> </textarea>
+
+<br>
+
+@foreach (var item in Model)
+{
+    <a href="#" onclick="addUser('@item.Name @item.Surname');">@item.Name @item.Surname</a>
+}
+
+<br>
+
+<button id="submitButton" type="button" onclick="goToSearch()">See Available Time</button>
+
+<script>
+    function addUser(name) {
+        var TheTextBox = document.getElementById("textBox");
+        if (TheTextBox.value === " " || TheTextBox.value === "") {
+            TheTextBox.value = name;
+        } else { TheTextBox.value = TheTextBox.value + ", " + name; }
+    };
+    function goToSearch() {
+        var TheTextBox = document.getElementById("textBox");
+    window.location.href = '@Url.Action("Search", "NewTrip")?userList=' + TheTextBox.value;
+    };
+</script>
