@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using Application.Entities;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Application.IServices;
 
 namespace WebApplication.Controllers
 {
@@ -16,11 +18,23 @@ namespace WebApplication.Controllers
     {
         private readonly ApplicationDbContext _context;
         private static int id1;
+        private IUserService _us;
+        private User user;
 
-        
-        public EventsController(ApplicationDbContext context)
+
+        public EventsController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
+            _context = context;
+            _us = us;
+        }
+        public override void OnActionExecuting(ActionExecutingContext ctx)
+        {
+            base.OnActionExecuting(ctx);
+            user = _us.GetUserFromRequest(Request);
+            if (user == null)
+                ViewBag.Name = "";
+            else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
         // GET: Events

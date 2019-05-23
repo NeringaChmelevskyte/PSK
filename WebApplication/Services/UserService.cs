@@ -128,14 +128,14 @@ namespace Application.Services
 
         public User GetUserFromRequest(HttpRequest Request)
         {
-            string token = Request.Cookies["token"];
-            if(token == null)
+            try
+            {
+                string token = Request.Cookies["token"];
+                return GetUserFromToken(token);
+            }
+            catch
             {
                 return null;
-            }
-            else
-            {
-                return GetUserFromToken(token);
             }
         }
 
