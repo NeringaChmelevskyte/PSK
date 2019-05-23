@@ -17,7 +17,6 @@ namespace Application.Entities
 
     public class Trip
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -37,5 +36,7 @@ namespace Application.Entities
 
         [Required]
         public TripStatusEnum TripStatus { get; set; }
+
+        public virtual ICollection<TripParticipator> Participators { get; set; }
     }
 }
