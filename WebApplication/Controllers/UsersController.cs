@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Application.Controllers
 {
@@ -18,10 +19,19 @@ namespace Application.Controllers
     public class UsersController : Controller
     {
         private IUserService _us;
+        private User user;
 
         public UsersController(IUserService us)
         {
             _us = us;
+        }
+        public override void OnActionExecuting(ActionExecutingContext ctx)
+        {
+            base.OnActionExecuting(ctx);
+            user = _us.GetUserFromRequest(Request);
+            if (user == null)
+                ViewBag.Name = "";
+            else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
         public IActionResult AllUsers()

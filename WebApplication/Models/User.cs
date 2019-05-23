@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Application.Entities
 {
@@ -29,5 +30,6 @@ namespace Application.Entities
         [Required]
         public string Email { get; set; }
         public Roles Role { get; set; }
+        public virtual ICollection<TripParticipator> Trips { get; set; }
     }
 }

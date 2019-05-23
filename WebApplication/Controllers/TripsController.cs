@@ -8,16 +8,29 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using WebApplication.Models;
 using Application.Entities;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Application.IServices;
 
 namespace WebApplication.Controllers
 {
     public class TripsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private IUserService _us;
+        private User user;
 
-        public TripsController(ApplicationDbContext context)
+        public TripsController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
+            _us = us;
+        }
+        public override void OnActionExecuting(ActionExecutingContext ctx)
+        {
+            base.OnActionExecuting(ctx);
+            user = _us.GetUserFromRequest(Request);
+            if (user == null)
+                ViewBag.Name = "";
+            else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
         public IActionResult AllTrips()
