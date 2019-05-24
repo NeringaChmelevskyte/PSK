@@ -59,6 +59,10 @@ namespace WebApplication.Controllers
         // GET: Apartments/Create
         public IActionResult Create()
         {
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
             return View();
         }
 
@@ -67,15 +71,15 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,OfficeId,RoomCount")] Apartment apartment)
+        public async Task<IActionResult> Create(string officeTitle, Apartment apartment)
         {
-            if (ModelState.IsValid)
-            {
+            
+                var office = _context.Office.SingleOrDefault(x => x.Name == officeTitle);
+                apartment.OfficeId = office.Id;
                 _context.Add(apartment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
-            return View(apartment);
+            
         }
 
         // GET: Apartments/Edit/5
@@ -87,29 +91,27 @@ namespace WebApplication.Controllers
             }
 
             var apartment = await _context.Apartment.FindAsync(id);
+            var office = await _context.Office.FindAsync(apartment.OfficeId);
+            apartment.Office = office;
             if (apartment == null)
             {
                 return NotFound();
             }
+            var offices = OfficeList();         
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
             return View(apartment);
         }
 
-        // POST: Apartments/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,OfficeId,RoomCount")] Apartment apartment)
-        {
-            if (id != apartment.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Edit(string officeTitle, Apartment apartment)
+        {         
                 try
                 {
+                    var office =  _context.Office.SingleOrDefault(x => x.Name == officeTitle);
+                    apartment.OfficeId = office.Id;
                     _context.Update(apartment);
                     await _context.SaveChangesAsync();
                 }
@@ -125,8 +127,7 @@ namespace WebApplication.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
-            return View(apartment);
+            
         }
 
         // GET: Apartments/Delete/5
@@ -139,6 +140,8 @@ namespace WebApplication.Controllers
 
             var apartment = await _context.Apartment
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var office = _context.Office.SingleOrDefault(x => x.Id == apartment.OfficeId);
+            apartment.Office = office;
             if (apartment == null)
             {
                 return NotFound();
@@ -161,6 +164,17 @@ namespace WebApplication.Controllers
         private bool ApartmentExists(int id)
         {
             return _context.Apartment.Any(e => e.Id == id);
+        }
+
+        public List<SelectListItem> OfficeList()
+        {
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            var offices = _context.Office.ToList();
+            foreach (var officeName in offices)
+            {
+                listItems.Add(new SelectListItem { Text = officeName.Name, Value = officeName.Name });
+            }
+            return listItems;
         }
     }
 }
