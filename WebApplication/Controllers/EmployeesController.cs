@@ -8,21 +8,34 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using Application.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Application.IServices;
+
 
 namespace WebApplication.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private IUserService _us;
+        private User user;
 
-        public EmployeesController(ApplicationDbContext context)
+        public EmployeesController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
-
+            _us = us;
+        }
+        public override void OnActionExecuting(ActionExecutingContext ctx)
+        {
+            base.OnActionExecuting(ctx);
+            user = _us.GetUserFromRequest(Request);
+            if (user == null)
+                ViewBag.Name = "";
+            else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
 
-       // GET: Employees
+        // GET: Employees
         public async Task<IActionResult> Index()
         {
             return View(await _context.Users.ToListAsync());

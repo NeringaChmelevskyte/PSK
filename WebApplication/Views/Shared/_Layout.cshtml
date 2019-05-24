@@ -36,20 +36,25 @@
                 </ul>
 
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">EmployeeHome</a></li>
+                    <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">@(ViewBag.Name != "" ? "EmployeeHome" : "")</a></li>
 
 
                 </ul>
 
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Trips" asp-action="AllTrips">Trips</a></li>
+                    <li><a asp-area="" asp-controller="Trips" asp-action="AllTrips">@(ViewBag.Name != "" ? "Trips" : "")</a></li>
+
+
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Apartments" asp-action="Index">@(ViewBag.Name != "" ? "Apartments" : "")</a></li>
 
 
                 </ul>
                 <p class="navbar-text navbar-right">
-                    <a asp-area="" asp-controller="Users" asp-action="LoginView">Logout</a>
+                    <a asp-area="" asp-controller="Users" asp-action="Logout">@(ViewBag.Name != "" ? "Logout" : "")</a>
                 </p>
-                <p class="navbar-text navbar-right">@User.Identity.Name</p>
+                <p class="navbar-text navbar-right">@ViewBag.Name</p>
             </div>
         </div>
     </nav>

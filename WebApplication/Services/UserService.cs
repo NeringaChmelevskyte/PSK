@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Application.IServices;
 using Application.Entities;
 using System.Security.Cryptography;
+using WebApplication.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Services
 {
@@ -38,6 +41,10 @@ namespace Application.Services
         public IEnumerable<User> GetAllUsers()
         {
             return _context.Users;
+        }
+        public User GetUser(int id)
+        {
+            return _context.Users.Where(i => i.Id == id).FirstOrDefault();
         }
         public User AddUser(User user)
         {
@@ -85,6 +92,61 @@ namespace Application.Services
                 _context.Update(user);
                 _context.SaveChanges();
             }
+        }
+
+        public void AddToken(User user, string token)
+        {
+            ActiveToken t = new ActiveToken
+            {
+                Token = token,
+                UserId = user.Id
+            };
+            _context.Add(t);
+            _context.SaveChanges();
+        }
+
+        public User GetUserFromToken(string token)
+        {
+            var t = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            if (t.ValidTo > DateTime.Now)
+            {
+                ActiveToken dbToken = _context.ActiveTokens.Where(i => i.Token == token).FirstOrDefault();
+                if (dbToken == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return _context.Users.Where(i => i.Id == dbToken.UserId).FirstOrDefault();
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public User GetUserFromRequest(HttpRequest Request)
+        {
+            try
+            {
+                string token = Request.Cookies["token"];
+                return GetUserFromToken(token);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public void DeleteToken(User user)
+        {
+            var tokens = _context.ActiveTokens.Where(a => a.UserId == user.Id).ToList();
+            foreach(ActiveToken token in tokens)
+            {
+                _context.ActiveTokens.Remove(token);
+            }
+            _context.SaveChanges();
         }
     }
 }

@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Application.IServices;
 using Application.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Application.Controllers
 {
@@ -14,10 +19,19 @@ namespace Application.Controllers
     public class UsersController : Controller
     {
         private IUserService _us;
+        private User user;
 
         public UsersController(IUserService us)
         {
             _us = us;
+        }
+        public override void OnActionExecuting(ActionExecutingContext ctx)
+        {
+            base.OnActionExecuting(ctx);
+            user = _us.GetUserFromRequest(Request);
+            if (user == null)
+                ViewBag.Name = "";
+            else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
         public IActionResult AllUsers()
@@ -36,9 +50,34 @@ namespace Application.Controllers
         public ActionResult Login(User value)
         {
             User user = _us.LoginUser(value.Email, value.Password);
-            if(user != null)
+            if (user != null)
+            {
+                //var claim = new Claim(JwtRegisteredClaimNames.Sub, user.Email);
+                var signinKey = new SymmetricSecurityKey(
+                  Encoding.UTF8.GetBytes("BMW 530 e60 160kw"));
+
+                int expiryInMinutes = 600;
+
+                var token = new JwtSecurityToken(
+                  issuer: "Musu app",
+                  audience: "Musu app",
+                  expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
+                  signingCredentials: new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256)
+                );
+                var stringToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                _us.AddToken(user, stringToken);
+
+                CookieOptions options = new CookieOptions();
+                options.Expires = token.ValidTo;
+                Response.Cookies.Append("token", stringToken, options);
+
                 return RedirectToAction("AllUsers", "Users");
-                else return Unauthorized();
+            }
+            else
+            {
+                return Unauthorized();
+            }
 
         }
 
@@ -91,6 +130,12 @@ namespace Application.Controllers
                            };
             ViewBag.EnumList = new SelectList(enumData, "ID", "Title");
             return View(user);
+        }
+        public IActionResult Logout()
+        {
+            var user = _us.GetUserFromRequest(Request);
+            _us.DeleteToken(user);
+            return RedirectToAction("LoginView");
         }
         public IActionResult LoginView()
         {

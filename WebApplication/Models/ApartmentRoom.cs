@@ -16,5 +16,7 @@ namespace Application.Entities
 
         [Required]
         public int ApartmentId { get; set; }
+
+        public virtual Apartment Apartment { get; set; }
     }
 }

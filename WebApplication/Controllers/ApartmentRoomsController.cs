@@ -6,21 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Application;
-using WebApplication.Models;
 using Application.Entities;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Application.IServices;
 
 namespace WebApplication.Controllers
 {
-    public class TripsController : Controller
+    public class ApartmentRoomsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private IUserService _us;
         private User user;
 
-        public TripsController(ApplicationDbContext context, IUserService us)
+        public ApartmentRoomsController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
             _us = us;
@@ -34,19 +32,14 @@ namespace WebApplication.Controllers
             else ViewBag.Name = user.Name + " " + user.Surname;
         }
 
-        public IActionResult AllTrips()
+        // GET: ApartmentRooms
+        public async Task<IActionResult> Index(int apartment)
         {
-            if (!TripExists(1)) return NotFound();
-            else return View();
+            //var rooms = await _context.ApartmentRoom.FirstOrDefaultAsync(a => a.ApartmentId == apartment.Id);
+            return View(await _context.ApartmentRoom.Include(p => p.Apartment).Where(a => a.ApartmentId == apartment).ToListAsync());
         }
 
-        // GET: Trips
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Trip.ToListAsync());
-        }
-
-        // GET: Trips/Details/5
+        // GET: ApartmentRooms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,39 +47,39 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trip
+            var apartmentRoom = await _context.ApartmentRoom
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (trip == null)
+            if (apartmentRoom == null)
             {
                 return NotFound();
             }
 
-            return View(trip);
+            return View(apartmentRoom);
         }
 
-        // GET: Trips/Create
+        // GET: ApartmentRooms/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Trips/Create
+        // POST: ApartmentRooms/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Create([Bind("Id,RoomNumber,ApartmentId")] ApartmentRoom apartmentRoom)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(trip);
+                _context.Add(apartmentRoom);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });
             }
-            return View(trip);
+            return View(apartmentRoom);
         }
 
-        // GET: Trips/Edit/5
+        // GET: ApartmentRooms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,22 +87,22 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trip.FindAsync(id);
-            if (trip == null)
+            var apartmentRoom = await _context.ApartmentRoom.FindAsync(id);
+            if (apartmentRoom == null)
             {
                 return NotFound();
             }
-            return View(trip);
+            return View(apartmentRoom);
         }
 
-        // POST: Trips/Edit/5
+        // POST: ApartmentRooms/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,RoomNumber,ApartmentId")] ApartmentRoom apartmentRoom)
         {
-            if (id != trip.Id)
+            if (id != apartmentRoom.Id)
             {
                 return NotFound();
             }
@@ -118,12 +111,12 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    _context.Update(trip);
+                    _context.Update(apartmentRoom);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TripExists(trip.Id))
+                    if (!ApartmentRoomExists(apartmentRoom.Id))
                     {
                         return NotFound();
                     }
@@ -132,12 +125,12 @@ namespace WebApplication.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });
             }
-            return View(trip);
+            return View(apartmentRoom);
         }
 
-        // GET: Trips/Delete/5
+        // GET: ApartmentRooms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -145,65 +138,30 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trip
+            var apartmentRoom = await _context.ApartmentRoom
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (trip == null)
+            if (apartmentRoom == null)
             {
                 return NotFound();
             }
 
-            return View(trip);
+            return View(apartmentRoom);
         }
 
-        // POST: Trips/Delete/5
+        // POST: ApartmentRooms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var trip = await _context.Trip.FindAsync(id);
-            _context.Trip.Remove(trip);
+            var apartmentRoom = await _context.ApartmentRoom.FindAsync(id);
+            _context.ApartmentRoom.Remove(apartmentRoom);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });
         }
 
-        private bool TripExists(int id)
+        private bool ApartmentRoomExists(int id)
         {
-            return _context.Trip.Any(e => e.Id == id);
-        }
-
-        
-
-        //TODO event -> trip
-        [HttpPost]
-        public JsonResult AddFlight(FlightInformation flightInformation)
-        {
-            var status = false;
-            if (flightInformation.TripId > 0)
-            {
-                
-                var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
-                if (v != null)
-                {
-                    Debug.WriteLine("If Viduje");
-                    //v.Id = flightInformation.Id;
-                    v.Id = v.Id;
-                    v.TripId = flightInformation.TripId;
-                    v.Cost = flightInformation.Cost;
-                    v.Start = flightInformation.Start;
-                    v.End = flightInformation.End;
-                    v.FlightTicketStatus = flightInformation.FlightTicketStatus;
-                    _context.Update(v);
-                }
-                else
-                {
-                    _context.Add(flightInformation);
-                }
-
-            }
-            _context.SaveChanges();
-            status = true;
-
-            return new JsonResult(status);
+            return _context.ApartmentRoom.Any(e => e.Id == id);
         }
     }
 }
