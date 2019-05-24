@@ -119,7 +119,6 @@
                     url: "/events/GetEvents",
                     dataType: "json",
                     success: function (data) {
-                        //alert(JSON.stringify(data));
                         $.each(data, function (i, v) {
                             events.push({
                                 eventId: v.eventId,
@@ -172,6 +171,9 @@
                             $description.append($('<p/>').html('<b>End:</b>' + calEvent.end.format("YYYY-MM-DD hh:mm a")));
                         }
                         $description.append($('<p/>').html('<b>Description:</b>' + calEvent.description));
+                        $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' nera'));
+                        $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
+                        $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
                         $('#myModal #pDetails').empty().html($description);
 
                         $('#myModal').modal();

@@ -40,6 +40,9 @@ namespace Application
         }
 
         public DbSet<Application.Entities.Trip> Trip { get; set; }
+        
+        public DbSet<FlightInformation> FlightInformation { get; set; }
+        
         public DbSet<TripParticipator> TripParticipators { get; set; }
 
         public DbSet<Application.Entities.Apartment> Apartment { get; set; }
