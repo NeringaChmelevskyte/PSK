@@ -60,6 +60,10 @@ namespace WebApplication.Controllers
         // GET: ApartmentRooms/Create
         public IActionResult Create()
         {
+            var apartments = ApartmentsList();
+            var values = from ap in apartments
+                         select ap.Text;
+            ViewBag.Apartaments = values;
             return View();
         }
 
@@ -68,15 +72,14 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoomNumber,ApartmentId")] ApartmentRoom apartmentRoom)
+        public async Task<IActionResult> Create(string apartamentTitle, ApartmentRoom apartmentRoom)
         {
-            if (ModelState.IsValid)
-            {
+                var apartament = _context.Apartment.SingleOrDefault(x => x.Title == apartamentTitle);
+                apartmentRoom.ApartmentId = apartament.Id;
                 _context.Add(apartmentRoom);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });
-            }
-            return View(apartmentRoom);
+            
         }
 
         // GET: ApartmentRooms/Edit/5
@@ -86,12 +89,18 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
-
+            
             var apartmentRoom = await _context.ApartmentRoom.FindAsync(id);
+            var apartment = await _context.Apartment.FindAsync(apartmentRoom.ApartmentId);
+            apartmentRoom.Apartment = apartment;
             if (apartmentRoom == null)
             {
                 return NotFound();
             }
+            var apartments = ApartmentsList();
+            var values = from ap in apartments
+                         select ap.Text;
+            ViewBag.Apartaments = values;
             return View(apartmentRoom);
         }
 
@@ -100,17 +109,13 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,RoomNumber,ApartmentId")] ApartmentRoom apartmentRoom)
+        public async Task<IActionResult> Edit(string apartmentTitle, ApartmentRoom apartmentRoom)
         {
-            if (id != apartmentRoom.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
+            
                 try
                 {
+                    var apartment = _context.Apartment.SingleOrDefault(x => x.Title == apartmentTitle);
+                    apartmentRoom.ApartmentId = apartment.Id;
                     _context.Update(apartmentRoom);
                     await _context.SaveChangesAsync();
                 }
@@ -125,9 +130,7 @@ namespace WebApplication.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });
-            }
-            return View(apartmentRoom);
+                return RedirectToAction(nameof(Index), new { apartment = apartmentRoom.ApartmentId });      
         }
 
         // GET: ApartmentRooms/Delete/5
@@ -140,6 +143,8 @@ namespace WebApplication.Controllers
 
             var apartmentRoom = await _context.ApartmentRoom
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var apartment = _context.Apartment.SingleOrDefault(x => x.Id == apartmentRoom.ApartmentId);
+            apartmentRoom.Apartment = apartment;
             if (apartmentRoom == null)
             {
                 return NotFound();
@@ -163,5 +168,17 @@ namespace WebApplication.Controllers
         {
             return _context.ApartmentRoom.Any(e => e.Id == id);
         }
+
+        public List<SelectListItem> ApartmentsList()
+        {
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            var apartments = _context.Apartment.ToList();
+            foreach (var apartment in apartments)
+            {
+                listItems.Add(new SelectListItem { Text = apartment.Title, Value = apartment.Title });
+            }
+            return listItems;
+        }
+
     }
 }
