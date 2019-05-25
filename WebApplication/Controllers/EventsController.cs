@@ -34,7 +34,11 @@ namespace WebApplication.Controllers
             user = _us.GetUserFromRequest(Request);
             if (user == null)
                 ViewBag.Name = "";
-            else ViewBag.Name = user.Name + " " + user.Surname;
+            else
+            {
+                ViewBag.Name = user.Name + " " + user.Surname;
+                ViewBag.Id = user.Id;
+            }
         }
 
         // GET: Events
@@ -59,6 +63,11 @@ namespace WebApplication.Controllers
 
         public IActionResult GetEvents()
         {
+            if (ViewBag.Id != null) { id1 = ViewBag.Id; }
+            else
+            {
+                return NotFound();
+            }
             if (id1 == 0) { id1 = 1; }
             var events = _context.Events.ToList();
             var filtered_events = events.Where(x => x.UserId == id1).ToList();

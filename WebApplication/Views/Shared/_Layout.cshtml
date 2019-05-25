@@ -51,6 +51,10 @@
 
 
                 </ul>
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Events" asp-action="Index">@(ViewBag.Name != "" ? "MyCalendar" : "")</a></li>
+
+                </ul>
                 <p class="navbar-text navbar-right">
                     <a asp-area="" asp-controller="Users" asp-action="Logout">@(ViewBag.Name != "" ? "Logout" : "")</a>
                 </p>
