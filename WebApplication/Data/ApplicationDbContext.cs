@@ -40,12 +40,17 @@ namespace Application
                 .HasForeignKey(bc => bc.TripId);
         }
 
-        public DbSet<Application.Entities.Trip> Trip { get; set; }
+        public DbSet<Trip> Trip { get; set; }
+        
+        public DbSet<FlightInformation> FlightInformation { get; set; }
+        
         public DbSet<TripParticipator> TripParticipators { get; set; }
 
-        public DbSet<Application.Entities.Apartment> Apartment { get; set; }
+        public DbSet<Apartment> Apartment { get; set; }
 
-        public DbSet<Application.Entities.ApartmentRoom> ApartmentRoom { get; set; }
+        public DbSet<ApartmentRoom> ApartmentRoom { get; set; }
+
+        public DbSet<Office> Office { get; set; }
 
     }
 }

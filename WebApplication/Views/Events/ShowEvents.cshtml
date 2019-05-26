@@ -23,6 +23,49 @@
     </div>
 </div>
 
+<div id="myModal2" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add flight</h4>
+            </div>
+            <div class="modal-body">
+
+                <form id='formFlight' style='border:2px solid green; padding:7px;'>
+                    <label>Departure:</label><br />
+                    <label>Time:</label>
+                    <div class="input-group date" id="dtflight1">
+                        <input type="text" id="txtStart" class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar">
+                            </span>
+                        </span>
+                    </div>
+                    <br />
+                    <label>Arrival:</label><br />
+                    
+                    <label>Time:</label>
+                    <div class="input-group date" id="dtflight2">
+                    <input type="text" id="txtEnd" class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar">
+                        </span>
+                    </span>
+            </div>
+            <label>Price:</label>
+            <input type="number" min="0.01" step="0.01" value="0" id="flightPrice" name="flightPrice" placeHolder="0"><br />
+            <input type="button" class="btn btn-success" id="btnFlightSubmit" value="submit">
+            </form>
+
+        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
@@ -44,7 +87,6 @@
                     url: "/events/GetEventsForShow",
                     dataType: "json",
                     success: function (data) {
-                        //alert(JSON.stringify(data));
                         $.each(data, function (i, v) {
                             events.push({
                                 eventId: v.eventId,
@@ -88,12 +130,56 @@
                             $description.append($('<p/>').html('<b>End:</b>' + calEvent.end.format("YYYY-MM-DD hh:mm a")));
                         }
                         $description.append($('<p/>').html('<b>Description:</b>' + calEvent.description));
-                        $('#myModal #pDetails').empty().html($description);
+                        $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>'));
+                        $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
+                        $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
 
+                        $('#myModal #pDetails').empty().html($description);
                         $('#myModal').modal();
                     }
                 })
             }
+
+            // TODO save flight info to DB :Trips/AddFlight
+
+            function SaveFlight(data) {
+                $.ajax({
+                    type: "POST",
+                    url: '/Trips/AddFlight',
+                    data: data,
+                    success: function (status) {
+                        if (status) {
+                            $('#myModal2').modal('hide');
+                        }
+                    },
+                    error: function () {
+                        alert('Failed');
+                    }
+                })
+            }
+            $('#myModal').on('click','#btnFlightAdd',function () {
+                if (selectedEvent != null) {
+                    $('#txtStart').val(selectedEvent.start.format('YYYY-MM-DD hh:mm a'));
+                    $('#txtEnd').val(selectedEvent.end.format('YYYY-MM-DD hh:mm a'));
+                }
+                $('#myModal2').modal();
+                return;
+            })
+
+                $('#dtflight1, #dtflight2').datetimepicker({
+                    format: 'YYYY-MM-DD hh:mm a'
+                });
+            
+            $('#myModal2').on('click', '#btnFlightSubmit', function () {
+                var data = {
+                    TripId: selectedEvent.eventId, // TODO: reikes pakeisti i trip ir tripId
+                    Cost: $('#flightPrice').val(),
+                    Start: $('#txtStart').val().trim(), // TODO: reikes pakeist i trip
+                    End: $('#txtEnd').val().trim(),  // TODO: reikes pakeist i trip
+                    FlightTicketStatus: 1 // TODO: add logic
+                }
+                SaveFlight(data);
+            })
         })
     </script>
 }

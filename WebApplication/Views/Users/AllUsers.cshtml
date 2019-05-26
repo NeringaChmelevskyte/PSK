@@ -44,14 +44,14 @@
                 @Html.DisplayFor(modelItem => item.Role)
             </td>
             <td>
-                @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, Role = item.Role }) 
+                @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, Role = item.Role })
             </td>
             <td>
-                @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id }) 
+                @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id })
             </td>
-            <td>
-                @Html.ActionLink("User Calendar", "index", "Events", new { id = item.Id }) 
-            </td>
+           @*<td>
+            @Html.ActionLink("User Calendar", "index", "Events", new { id = item.Id })
+            </td>*@
             <td>
                 @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
             </td>

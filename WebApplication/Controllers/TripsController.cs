@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using WebApplication.Models;
 using Application.Entities;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Application.IServices;
 
@@ -230,7 +231,40 @@ namespace WebApplication.Controllers
             //var filtered_events = events.Where(x => x.UserId == id1).ToList();
 
             return new JsonResult(flight);
+        }
+        
 
+        //TODO event -> trip
+        [HttpPost]
+        public JsonResult AddFlight(FlightInformation flightInformation)
+        {
+            var status = false;
+            if (flightInformation.TripId > 0)
+            {
+                
+                var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
+                if (v != null)
+                {
+                    Debug.WriteLine("If Viduje");
+                    //v.Id = flightInformation.Id;
+                    v.Id = v.Id;
+                    v.TripId = flightInformation.TripId;
+                    v.Cost = flightInformation.Cost;
+                    v.Start = flightInformation.Start;
+                    v.End = flightInformation.End;
+                    v.FlightTicketStatus = flightInformation.FlightTicketStatus;
+                    _context.Update(v);
+                }
+                else
+                {
+                    _context.Add(flightInformation);
+                }
+
+            }
+            _context.SaveChanges();
+            status = true;
+
+            return new JsonResult(status);
         }
     }
 }

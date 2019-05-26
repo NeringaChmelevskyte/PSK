@@ -1,11 +1,9 @@
 ﻿@model Application.Entities.Apartment
-
 @{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
 
 <h4>Apartment</h4>
 <hr />
@@ -20,9 +18,9 @@
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Office.Name" class="control-label"></label>
-                <input asp-for="Office.Name" class="form-control" />
-                <span asp-validation-for="Office.Name" class="text-danger"></span>
+              <label asp-for="Office.Name" class="control-label"></label>
+              @Html.DropDownList("officeTitle", new SelectList(ViewBag.Offices))
+
             </div>
             <div class="form-group">
                 <label asp-for="RoomCount" class="control-label"></label>
@@ -30,7 +28,7 @@
                 <span asp-validation-for="RoomCount" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Save" formaction=@Url.Action("Edit", "Apartments", new { Id = Model.Id, Title = Model.Title, OfficeId = Model.OfficeId, RoomCount = Model.RoomCount}) formmethod="post" class="btn btn-default" />
             </div>
         </form>
     </div>

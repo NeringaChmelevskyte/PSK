@@ -20,19 +20,15 @@
                 <span asp-validation-for="RoomNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ApartmentId" class="control-label"></label>
-                <input asp-for="ApartmentId" class="form-control" />
-                <span asp-validation-for="ApartmentId" class="text-danger"></span>
+                <label asp-for="Apartment.Title" class="control-label"></label>
+                @Html.DropDownList("apartamentTitle", new SelectList(ViewBag.Apartaments))
+
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Save" formaction=@Url.Action("Edit", "ApartmentRoom", new { Id = Model.Id, Apartment = Model.Apartment, RoomNumber = Model.RoomNumber}) formmethod="post" class="btn btn-default" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
