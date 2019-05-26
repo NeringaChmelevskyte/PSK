@@ -42,8 +42,6 @@ namespace Application
 
         public DbSet<Trip> Trip { get; set; }
         
-        public DbSet<FlightInformation> FlightInformation { get; set; }
-        
         public DbSet<TripParticipator> TripParticipators { get; set; }
 
         public DbSet<Apartment> Apartment { get; set; }
