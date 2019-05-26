@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<Application.Entities.Trip>
 
-
+@{
+    ViewData["Title"] = "AllTrips";
+}
 
 <div id="myModalFlightDetails" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -130,10 +132,10 @@
                 </td>
                 <td>
                     @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-        <button type="button" class="btn btn-default" id="btnTripDetails">Details</button> *@
-                    
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <button type="button" class="btn btn-default" id="btnTripDetails">Details</button> *@
+
                     <a href='#' class='btnTripDetails' id='@item.Id'>Details</a>
                 </td>
             </tr>
@@ -152,7 +154,7 @@
             var flight = [];
             var events = [];
             var selectedTrip = null;
-            
+
 
             function SaveFlight(data) {
                 $.ajax({
@@ -201,7 +203,7 @@
                             $description.append($('<p/>').html('<b>End:</b>' + calEvent.end.format("YYYY-MM-DD hh:mm a")));
                         }
                         $description.append($('<p/>').html('<b>Description:</b>' + calEvent.description));
-                        $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>' ));
+                        $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>'));
                         $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
                         $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
                         $('#myModal #pDetails').empty().html($description);
@@ -211,7 +213,7 @@
             }
 
             function getTripById(tripId) {
-                
+
                 trip = [];
                 $.ajax({
                     type: "Get",
@@ -238,7 +240,7 @@
                             if (v.end != null) {
                                 $description.append($('<p/>').html('<b>End:</b>' + v.end.format("YYYY-MM-DD hh:mm a")));
                             }
-                            
+
                             $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>' + '&nbsp' + '<button type="button" id="btnFlightInfo" class="btn btn-defaulk">Flight info</button>'));
                             $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
                             $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
@@ -305,7 +307,7 @@
                         })
 
                         $.each(flight, function (i, v) {
-                            
+
                             $('#myModalFlightInfo #eventTitle').text("Flight info");
                             var $description = $('<div/>');
                             $description.append($('<p/>').html('<b>Trip Id:</b>' + v.tripId));
@@ -316,12 +318,12 @@
                             }
                             $description.append($('<p/>').html('<b>Flight ticket status:</b>' + v.flightTicketStatus));
 
-                            
+
                             $('#myModalFlightInfo #pDetails').empty().html($description);
                             $('#myModalFlightInfo').modal();
 
                         })
-                        
+
                     },
                     error: function () {
                         alert('Failed');
