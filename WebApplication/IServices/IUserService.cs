@@ -19,6 +19,7 @@ namespace Application.IServices
         User GetUserFromToken(string token);
         User GetUserFromRequest(HttpRequest Request);
         void DeleteToken(User user);
+        List<User> GetUserListFromStringList(List<string> stringList);
 
     }
 }
