@@ -22,7 +22,7 @@ namespace Application.Entities
         public int TripId { get; set; }
 
         [Required]
-        public decimal Cost { get; set; }
+        public Single Cost { get; set; }
 
         [Required]
         public DateTime Start { get; set; }
@@ -30,7 +30,7 @@ namespace Application.Entities
         [Required]
         public DateTime End { get; set; }
 
-        public TicketStatusEnum TicketStatus { get; set; }
+        public TicketStatusEnum FlightTicketStatus { get; set; }
 
     }
 }
