@@ -32,8 +32,8 @@ namespace WebApplication.Controllers
             else ViewBag.Name = user.Name + " " + user.Surname;
             ViewBag.offices = _context.Office.ToList();
             ViewBag.users = _context.Users.ToList();
+            ViewBag.tp = _context.TripParticipators.ToList();
         }
-
         [HttpPost]
         public JsonResult AddParticipant(int id)
         {
@@ -132,15 +132,21 @@ namespace WebApplication.Controllers
             Console.WriteLine(trip.Id);
 
             trip.Participators = new List<TripParticipator>();
+            int i1 = 0;
+            list = list.Distinct().ToList();
             foreach (int i in list)
             {
-                Console.WriteLine("cia musus elementas "+i);
+
+                Console.WriteLine("cia musus elementas " + i);
                 TripParticipator participator = new TripParticipator();
                 participator.TripId = trip.Id;
                 participator.UserId = i;
-
-                trip.Participators.Add(participator);
+                participator.Approve = false;
+                if (i1 != i) { 
                 _context.Add(participator);
+                }
+                i1 = i;
+                
             }
             await _context.SaveChangesAsync();
 

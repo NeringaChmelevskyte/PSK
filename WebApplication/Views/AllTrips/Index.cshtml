@@ -114,6 +114,11 @@
     <tbody>
         @foreach (var item in Model)
         {
+            @foreach (var item1 in ViewBag.offices)
+            {
+                if (item1.Id == item.FromOffice) { ViewData["Name1"] = item1.Name; }
+                if (item1.Id == item.ToOffice) { ViewData["Name2"] = item1.Name; }
+            }
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
@@ -125,10 +130,10 @@
                     @Html.DisplayFor(modelItem => item.End)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Office.Name)
+                    @ViewData["Name1"]
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Office2.Name)
+                    @ViewData["Name2"]
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TripStatus)

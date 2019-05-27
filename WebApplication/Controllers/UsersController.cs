@@ -30,12 +30,43 @@ namespace Application.Controllers
             base.OnActionExecuting(ctx);
             user = _us.GetUserFromRequest(Request);
             if (user == null)
+            {
                 ViewBag.Name = "";
-            else ViewBag.Name = user.Name + " " + user.Surname;
+            }
+            
+            else
+            {
+                
+                ViewBag.Name = user.Name + " " + user.Surname;
+
+            }
+
         }
 
         public IActionResult AllUsers()
         {
+            ViewBag.Trips = null;
+            ViewBag.Offices = _us.GetAllOffices();
+            var trips = _us.GetAllTrips();
+            var tpList = _us.GetAllTripParticipators();
+            var list = tpList.Where(x => x.UserId == user.Id && x.Approve==false);
+            foreach (TripParticipator tp in tpList)
+            {
+                Console.WriteLine(tp.UserId + "  :  " + tp.TripId);
+            }
+            List<Trip> list1 = new List<Trip>();
+            foreach (TripParticipator tp in list)
+            {
+                foreach (Trip t in trips)
+                {
+                    if (tp.TripId == t.Id)
+                    {
+                        list1.Add(t);
+                    }
+                }
+
+            }
+            ViewBag.Trips = list1;
             var users = Get();
             return View(users);
         }
@@ -44,6 +75,30 @@ namespace Application.Controllers
         public IEnumerable<User> Get()
         {
             return _us.GetAllUsers();
+        }
+
+        [HttpPost]
+        public JsonResult AddParticipant(int id)
+        {
+            var list = _us.GetAllTripParticipators();
+            var list1 = list.Where(x => x.UserId == user.Id && x.TripId == id);
+            TripParticipator tp = list.FirstOrDefault(x => x.UserId == user.Id && x.TripId == id);
+            tp.Approve = true;
+            _us.UpdateTripParticipator(tp);
+            var status = true;
+
+            return new JsonResult(status);
+        }
+        [HttpPost]
+        public JsonResult RemoveParticipant(int id)
+        {
+            var list = _us.GetAllTripParticipators();
+            var list1 = list.Where(x => x.UserId == user.Id && x.TripId == id);
+            TripParticipator tp = list.FirstOrDefault(x => x.UserId == user.Id && x.TripId == id);
+            _us.RemoveTripParticipator(tp);
+            var status = true;
+
+            return new JsonResult(status);
         }
 
         [HttpPost]
