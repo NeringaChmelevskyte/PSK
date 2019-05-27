@@ -32,12 +32,14 @@ namespace Application.Controllers
             if (user == null)
             {
                 ViewBag.Name = "";
+                ViewBag.Role = "";
             }
             
             else
             {
                 
                 ViewBag.Name = user.Name + " " + user.Surname;
+                ViewBag.Role = user.Role;
 
             }
 
@@ -45,11 +47,16 @@ namespace Application.Controllers
 
         public IActionResult AllUsers()
         {
+            var users = Get();
+            return View(users);
+        }
+        public IActionResult Home()
+        {
             ViewBag.Trips = null;
             ViewBag.Offices = _us.GetAllOffices();
             var trips = _us.GetAllTrips();
             var tpList = _us.GetAllTripParticipators();
-            var list = tpList.Where(x => x.UserId == user.Id && x.Approve==false);
+            var list = tpList.Where(x => x.UserId == user.Id && x.Approve == false);
             foreach (TripParticipator tp in tpList)
             {
                 Console.WriteLine(tp.UserId + "  :  " + tp.TripId);
@@ -127,7 +134,12 @@ namespace Application.Controllers
                 options.Expires = token.ValidTo;
                 Response.Cookies.Append("token", stringToken, options);
 
-                return RedirectToAction("AllUsers", "Users");
+                if (user.Role is 0)
+                {
+                    return RedirectToAction("AllUsers", "Users");
+                }
+                else return RedirectToAction("Home", "Users");
+
             }
             else
             {
