@@ -1,0 +1,128 @@
+﻿@model Application.Entities.Trip
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Trip</h4>
+<form id="myform">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Add
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Surname
+                </th>
+                <th>
+                    Email
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.users)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="checkfield" id="@item.Id" onchange="doalert(this,@item.Id)" />
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Surname
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Start" class="control-label"></label>
+                <input asp-for="Start" class="form-control" />
+                <span asp-validation-for="Start" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="End" class="control-label"></label>
+                <input asp-for="End" class="form-control" />
+                <span asp-validation-for="End" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FromOffice" class="control-label"></label>
+                @Html.DropDownList("officeTitle1", new SelectList(ViewBag.Offices))
+            </div>
+            <div class="form-group">
+                <label asp-for="ToOffice" class="control-label"></label>
+                @Html.DropDownList("officeTitle2", new SelectList(ViewBag.Offices))
+            </div>
+            <div>
+
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function doalert(checkboxElem,Id) {
+            if (checkboxElem.checked) {
+                alert(Id);
+                $.ajax({
+                        type: "POST",
+                        url: '/Trip/AddParticipant',
+                        data: { 'id': Id },
+                        success: function (status) {
+                            if (status) {
+                            }
+                        },
+                    error: function () {
+                        alert('Failed');
+                    }
+                })
+                 } 
+                     else {
+
+                $.ajax({
+                        type: "POST",
+                        url: '/Trip/RemoveParticipant',
+                        data: { 'id': Id },
+                        success: function (status) {
+                            if (status) {
+                                alert("bye");
+                            }
+                        },
+                    error: function () {
+                        alert('Failed');
+                    }
+                })
+            }
+        }
+    </script>
+}
