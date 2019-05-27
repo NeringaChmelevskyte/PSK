@@ -237,5 +237,66 @@ namespace WebApplication.Controllers
         {
             return _context.Trip.Any(e => e.Id == id);
         }
+
+        [HttpPost]
+        public JsonResult AddFlight(FlightInformation flightInformation)
+        {
+            var status = false;
+            if (flightInformation.TripId > 0)
+            {
+
+                var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
+                if (v != null)
+                {
+
+                    //v.Id = flightInformation.Id;
+                    v.Id = v.Id;
+                    v.TripId = flightInformation.TripId;
+                    v.Cost = flightInformation.Cost;
+                    v.Start = flightInformation.Start;
+                    v.End = flightInformation.End;
+                    v.FlightTicketStatus = flightInformation.FlightTicketStatus;
+                    _context.Update(v);
+                }
+                else
+                {
+                    _context.Add(flightInformation);
+                }
+
+            }
+            _context.SaveChanges();
+            status = true;
+
+            return new JsonResult(status);
+        }
+
+        [HttpGet]
+        public IActionResult GetTrip(int id)
+        {
+
+
+            var trips = _context.Trip.ToList();
+            var trip = trips.Where(t => t.Id == id).ToList();
+            //var filtered_events = events.Where(x => x.UserId == id1).ToList();
+
+            return new JsonResult(trip);
+
+        }
+
+        [HttpGet]
+        public IActionResult GetFlight(int id)
+        {
+
+
+            var flights = _context.FlightInformation.ToList();
+            var flight = flights.Where(t => t.TripId == id).ToList();
+            //var filtered_events = events.Where(x => x.UserId == id1).ToList();
+
+            return new JsonResult(flight);
+        }
+        public IActionResult AddTripView()
+        {
+            return View();
+        }
     }
 }
