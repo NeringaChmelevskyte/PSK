@@ -35,10 +35,10 @@ namespace WebApplication.Controllers
         // GET: Trip
         public async Task<IActionResult> Index()
         {
-             var trips = await _context.Trip.Include(p => p.Office).Include(o => o.Office2).ToListAsync();
-             return View(trips);
+            var trips = await _context.Trip.Include(p => p.Office).Include(o => o.Office2).ToListAsync();
+            return View(trips);
         }
-        
+
 
         // GET: Trip/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -89,7 +89,7 @@ namespace WebApplication.Controllers
             _context.Add(trip);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-            
+
         }
 
         // GET: Trip/Edit/5
@@ -130,7 +130,7 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip)
         {
-          
+
             try
             {
                 var officeFrom = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
@@ -142,17 +142,17 @@ namespace WebApplication.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                    if (!TripExists(trip.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                if (!TripExists(trip.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
-           return RedirectToAction(nameof(Index));
-    }
+            return RedirectToAction(nameof(Index));
+        }
 
         // GET: Trip/Delete/5
         public async Task<IActionResult> Delete(int? id)
