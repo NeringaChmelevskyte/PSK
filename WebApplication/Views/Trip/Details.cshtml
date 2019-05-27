@@ -10,6 +10,11 @@
     <h4>Trip</h4>
     <hr />
     <dl class="dl-horizontal">
+        @foreach (var item1 in ViewBag.offices)
+        {
+            if (item1.Id == Model.FromOffice) { ViewData["Name1"] = item1.Name; }
+            if (item1.Id == Model.ToOffice) { ViewData["Name2"] = item1.Name; }
+        }
         <dt>
             @Html.DisplayNameFor(model => model.Title)
         </dt>
@@ -32,13 +37,13 @@
             @Html.DisplayNameFor(model => model.FromOffice)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.FromOffice)
+            @ViewData["Name1"]
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.ToOffice)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ToOffice)
+            @ViewData["Name2"]
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.TripStatus)
@@ -64,12 +69,19 @@
                 <th>
                     Role
                 </th>
+                <th>
+                    AcceptedInvitation
+                </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in ViewBag.Participators)
             {
+                @foreach (var item1 in ViewBag.tp)
+                {
+                    if (item1.UserId == item.Id && item1.TripId==Model.Id) { ViewData["Name3"] = item1.Approve; }
+                }
                 <tr>
                     <td>
                         @item.Name
@@ -82,6 +94,9 @@
                     </td>
                     <td>
                         @item.Role
+                    </td>
+                    <td>
+                        @ViewData["Name3"]
                     </td>
                     <td>
                         @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })

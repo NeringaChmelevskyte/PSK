@@ -15,5 +15,7 @@ namespace Application.Entities
         [Required]
         public int TripId { get; set; }
         public Trip Trip { get; set; }
+
+        public bool Approve{ get; set; }
     }
 }

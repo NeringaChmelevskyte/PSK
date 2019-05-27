@@ -4,7 +4,7 @@
     ViewData["Title"] = "AllUsers";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-  
+
 <h2>All Users</h2>
 
 <p>
@@ -29,34 +29,39 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role)
-            </td>
-            <td>
-                @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, Role = item.Role })
-            </td>
-            <td>
-                @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id })
-            </td>
-           @*<td>
-            @Html.ActionLink("User Calendar", "index", "Events", new { id = item.Id })
-            </td>*@
-            <td>
-                @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    @Html.ActionLink("edit", "EditUserView", "Users", new { Id = item.Id, Name = item.Name, Surname = item.Surname, Email = item.Email, Password = item.Password, Role = item.Role })
+                </td>
+                <td>
+                    @Html.ActionLink("delete", "DeleteView", "Users", new { id = item.Id })
+                </td>
+                @*<td>
+                    @Html.ActionLink("User Calendar", "index", "Events", new { id = item.Id })
+                    </td>*@
+                <td>
+                    @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
 

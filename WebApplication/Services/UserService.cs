@@ -42,6 +42,18 @@ namespace Application.Services
         {
             return _context.Users;
         }
+        public IEnumerable<Office> GetAllOffices()
+        {
+            return _context.Office;
+        }
+        public IEnumerable<Trip> GetAllTrips()
+        {
+            return _context.Trip;
+        }
+        public IEnumerable<TripParticipator> GetAllTripParticipators()
+        {
+            return _context.TripParticipators;
+        }
         public User GetUser(int id)
         {
             return _context.Users.Where(i => i.Id == id).FirstOrDefault();
@@ -72,6 +84,15 @@ namespace Application.Services
                 _context.SaveChanges();
             }
         }
+        public void RemoveTripParticipator(TripParticipator tp)
+        {
+            if (tp != null)
+            {
+                _context.Remove(tp);
+                _context.SaveChanges();
+            }
+
+        }
 
         public void UpdateUser(User user)
         {
@@ -93,6 +114,16 @@ namespace Application.Services
                 _context.SaveChanges();
             }
         }
+        public void UpdateTripParticipator(TripParticipator tp)
+        {
+
+            if (tp != null)
+            {
+                _context.Update(tp);
+                _context.SaveChanges();
+            }
+        }
+
 
         public void AddToken(User user, string token)
         {

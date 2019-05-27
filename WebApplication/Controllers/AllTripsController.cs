@@ -31,6 +31,7 @@ namespace WebApplication.Controllers
             if (user == null)
                 ViewBag.Name = "";
             else ViewBag.Name = user.Name + " " + user.Surname;
+            ViewBag.offices = _context.Office.ToList();
         }
         // GET: Trip
         public async Task<IActionResult> Index()

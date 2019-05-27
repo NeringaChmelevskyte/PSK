@@ -12,9 +12,14 @@ namespace Application.IServices
         User LoginUser(string email, string password);
         User AddUser(User user);
         IEnumerable<User> GetAllUsers();
+        IEnumerable<Office> GetAllOffices();
+        IEnumerable<Trip> GetAllTrips();
+        IEnumerable<TripParticipator> GetAllTripParticipators();
         User GetUser(int id);
         void RemoveUser(int id);
+        void RemoveTripParticipator(TripParticipator tp);
         void UpdateUser(User user);
+        void UpdateTripParticipator(TripParticipator tp);
         void AddToken(User user, string token);
         User GetUserFromToken(string token);
         User GetUserFromRequest(HttpRequest Request);

@@ -30,11 +30,9 @@ namespace Application.Entities
         public DateTime End { get; set; }
 
         [Required]
-        [ForeignKey("Office")]
         public int FromOffice { get; set; }
 
         [Required]
-        [ForeignKey("Office2")]
         public int ToOffice { get; set; }
 
         [Required]
