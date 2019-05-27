@@ -1,8 +1,6 @@
 ﻿@model IEnumerable<Application.Entities.Trip>
 
-@{
-    ViewData["Title"] = "AllTrips";
-}
+
 
 <div id="myModalFlightDetails" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -132,37 +130,32 @@
                 </td>
                 <td>
                     @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        <button type="button" class="btn btn-default" id="btnTripDetails">Details</button> *@
-
+        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+        <button type="button" class="btn btn-default" id="btnTripDetails">Details</button> *@
+                    
                     <a href='#' class='btnTripDetails' id='@item.Id'>Details</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
-<link href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.print.css" rel="stylesheet" media="print" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
 @section Scripts{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script>
         $(document).ready(function () {
-            var previousFlightDetails = null;
-            var flightTemp = null;
-            var flightStatus = null;
             var trip = [];
             var tripId = null;
             var flight = [];
             var events = [];
             var selectedTrip = null;
-
+            
 
             function SaveFlight(data) {
-                return $.ajax({
+                $.ajax({
                     type: "POST",
                     url: '/Trips/AddFlight',
                     data: data,
@@ -178,49 +171,47 @@
             }
 
             $('.btnTripDetails').on('click', function (event) {
-                
                 tripId = event.target.id;
-                getFlightById(tripId);
-                getTripById(tripId);
-                
-                function checkIfLoaded() {
 
-                    if (trip.length > 0) {
-                        
-                        GenerateTripDetailsModal();
-                    }
-                }
-                setTimeout(checkIfLoaded, 200);
-      
+                getTripById(tripId);
+
                 return;
             })
 
-            function GenerateTripDetailsModal() {
-                $.each(trip, function (i, v) {
-                    $('#myModalFlightDetails #eventTitle').text(v.title);
-                    var $description = $('<div/>');
-                    $description.append($('<p/>').html('<b>Start:</b>' + v.start.format("YYYY-MM-DD hh:mm a")));
-                    if (v.end != null) {
-                        $description.append($('<p/>').html('<b>End:</b>' + v.end.format("YYYY-MM-DD hh:mm a")));
+            function GenerateCalender(events) {
+                $('#calender').fullCalendar('destroy');
+                $('#calender').fullCalendar({
+                    contentHeight: 400,
+                    defaultDate: new Date(),
+                    timeFormat: 'h(:mm)a',
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,basicWeek,basicDay,agenda'
+                    },
+                    eventLimit: true,
+                    eventColor: '#378006',
+                    events: events,
+                    eventClick: function (calEvent, jsEvent, view) {
+                        selectedEvent = calEvent;
+                        $('#myModal #eventTitle').text(calEvent.title);
+                        var $description = $('<div/>');
+                        $description.append($('<p/>').html('<b>Start:</b>' + calEvent.start.format("YYYY-MM-DD hh:mm a")));
+                        if (calEvent.end != null) {
+                            $description.append($('<p/>').html('<b>End:</b>' + calEvent.end.format("YYYY-MM-DD hh:mm a")));
+                        }
+                        $description.append($('<p/>').html('<b>Description:</b>' + calEvent.description));
+                        $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>' ));
+                        $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
+                        $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
+                        $('#myModal #pDetails').empty().html($description);
+                        $('#myModal').modal();
                     }
-                    if (flightStatus == 0) {
-                        $description.append($('<p/>').html('<b>Airplane tickets:</b>' + '<b style="color:orange;">Not Required</b>'));
-
-                    } else {
-                        $description.append($('<p/>').html('<b>Airplane tickets:</b>' + '<span id="flightDetailsInfo">' + (flightStatus == 1 ? '<b style="color:red";>Not Booked</b>' : '<b style="color:green";>Booked</b>') + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk">' + (flightStatus == 1 ? 'Add' : 'Change')  +' flight tickets</button>' + '&nbsp' + (flightStatus == 1? "" :'<button type="button" id="btnFlightInfo" class="btn btn-defaulk">Flight info</button></span>')));
-
-                    }
-                    $description.append($('<p/>').html('<b>Rental car:</b>' + ' nera'));
-                    $description.append($('<p/>').html('<b>Accommodation:</b>' + ' apartamentai'));
-                    $('#myModalFlightDetails #pDetails').empty().html($description);
-                    $('#myModalFlightDetails').modal();
                 })
             }
 
             function getTripById(tripId) {
-
-               
-
+                
                 trip = [];
                 $.ajax({
                     type: "Get",
@@ -237,8 +228,22 @@
                                 toOffice: v.toOffice,
                                 tripStatus: v.tripStatus
                             });
+                        })
 
+                        $.each(trip, function (i, v) {
+                            tripId = v.id;
+                            $('#myModalFlightDetails #eventTitle').text(v.title);
+                            var $description = $('<div/>');
+                            $description.append($('<p/>').html('<b>Start:</b>' + v.start.format("YYYY-MM-DD hh:mm a")));
+                            if (v.end != null) {
+                                $description.append($('<p/>').html('<b>End:</b>' + v.end.format("YYYY-MM-DD hh:mm a")));
+                            }
                             
+                            $description.append($('<p/>').html('<b>Lektuvo bilietai:</b>' + ' yra' + ' <button type="button" id="btnFlightAdd" class="btn btn-defaulk"> Add flight tickets</button>' + '&nbsp' + '<button type="button" id="btnFlightInfo" class="btn btn-defaulk">Flight info</button>'));
+                            $description.append($('<p/>').html('<b>Nuomojama masina:</b>' + ' nera'));
+                            $description.append($('<p/>').html('<b>Apgyvendinimas:</b>' + ' apartamentai'));
+                            $('#myModalFlightDetails #pDetails').empty().html($description);
+                            $('#myModalFlightDetails').modal();
 
                         })
 
@@ -250,13 +255,15 @@
             }
 
             $('#myModalFlightDetails').on('click', '#btnFlightAdd', function () {
-                GenerateFlightCreateModal();
+
+                $('#myModal2').modal();
                 return;
             })
 
             $('#myModalFlightDetails').on('click', '#btnFlightInfo', function () {
-                GenerateFlightDetailsModal();
-                
+
+                $('#myModalFlightInfo').modal();
+                getFlightById(tripId);
                 return;
             })
 
@@ -266,65 +273,26 @@
             });
 
             $('#myModal2').on('click', '#btnFlightSubmit', function () {
-                var tempFlightTicketStatus = flightStatus;
                 var data = {
-                    TripId: tripId,
+                    TripId: tripId, // TODO: reikes pakeisti i trip ir tripId
                     Cost: $('#flightPrice').val(),
-                    Start: $('#txtStart').val().trim(),
-                    End: $('#txtEnd').val().trim(),
-                    FlightTicketStatus: 2 // 2 = Booked 
+                    Start: $('#txtStart').val().trim(), // TODO: reikes pakeist i trip
+                    End: $('#txtEnd').val().trim(),  // TODO: reikes pakeist i trip
+                    FlightTicketStatus: 1 // TODO: add logic
                 }
-
-                SaveFlight(data).done(function (result) {
-                    getFlightById(tripId);
-                });
-
-                if (tempFlightTicketStatus == 1) {
-                    $('#flightDetailsInfo').empty();
-                    $('#flightDetailsInfo').append('<b style="color: green";>Booked</b> <button type="button" id="btnFlightAdd" class="btn btn - defaulk">Change flight tickets</button>' + '&nbsp' + '<button type="button" id="btnFlightInfo" class="btn btn - defaulk">Flight info</button>');
-                }
+                SaveFlight(data);
             })
-            function GenerateFlightCreateModal() {
-                if (flight.length != 0) {
-                    $.each(flight, function (i, v) {
-                        $('#flightPrice').val(v.cost);
-                        $('#txtStart').val(v.start.format("YYYY-MM-DD hh:mm a"));
-                        $('#txtEnd').val(v.end.format("YYYY-MM-DD hh:mm a"));
-                    })
-                } else {
-                    $('#flightPrice').val(null);
-                    $('#txtStart').val(null);
-                    $('#txtEnd').val(null);
 
-                }
-                $('#myModal2').modal();
-            }
-
-            function GenerateFlightDetailsModal() {
-                $.each(flight, function (i, v) {
-                            $('#myModalFlightInfo #eventTitle').text("Flight info");
-                            var $description = $('<div/>');
-                            $description.append($('<p/>').html('<b>Trip Id:</b>' + v.tripId));
-                            $description.append($('<p/>').html('<b>Cost:</b>' + v.cost));
-                            $description.append($('<p/>').html('<b>Start:</b>' + v.start.format("YYYY-MM-DD hh:mm a")));
-                            $description.append($('<p/>').html('<b>End:</b>' + v.end.format("YYYY-MM-DD hh:mm a")));
-                            $description.append($('<p/>').html('<b>Flight ticket status:</b>' + v.flightTicketStatus));
-
-                            $('#myModalFlightInfo #pDetails').empty().html($description);
-                            $('#myModalFlightInfo').modal();
-                        })
-            }
-             
             function getFlightById(tripId) {
-                flightStatus = null;
+
                 flight = [];
                 $.ajax({
                     type: "Get",
                     url: '/Trips/GetFlight/' + tripId,
                     dataType: "json",
                     success: function (data) {
+
                         $.each(data, function (i, v) {
-                            flightStatus = v.flightTicketStatus;
                             flight.push({
                                 id: v.id,
                                 tripId: v.tripId,
@@ -332,15 +300,33 @@
                                 start: moment(v.start),
                                 end: v.end != null ? moment(v.end) : null,
                                 flightTicketStatus: v.flightTicketStatus
-                            })
+                            });
+                            console.log(flight);
                         })
 
+                        $.each(flight, function (i, v) {
+                            
+                            $('#myModalFlightInfo #eventTitle').text("Flight info");
+                            var $description = $('<div/>');
+                            $description.append($('<p/>').html('<b>Trip Id:</b>' + v.tripId));
+                            $description.append($('<p/>').html('<b>Cost:</b>' + v.cost));
+                            $description.append($('<p/>').html('<b>Start:</b>' + v.start.format("YYYY-MM-DD hh:mm a")));
+                            if (v.end != null) {
+                                $description.append($('<p/>').html('<b>End:</b>' + v.end.format("YYYY-MM-DD hh:mm a")));
+                            }
+                            $description.append($('<p/>').html('<b>Flight ticket status:</b>' + v.flightTicketStatus));
 
+                            
+                            $('#myModalFlightInfo #pDetails').empty().html($description);
+                            $('#myModalFlightInfo').modal();
+
+                        })
+                        
                     },
                     error: function () {
                         alert('Failed');
                     }
-                });
+                })
             }
         })
     </script>

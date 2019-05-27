@@ -6,21 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Application;
-using WebApplication.Models;
 using Application.Entities;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Application.IServices;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Diagnostics;
 
 namespace WebApplication.Controllers
 {
-    public class TripsController : Controller
+    public class AllTripsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private IUserService _us;
         private User user;
 
-        public TripsController(ApplicationDbContext context, IUserService us)
+        public AllTripsController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
             _us = us;
@@ -33,24 +32,15 @@ namespace WebApplication.Controllers
                 ViewBag.Name = "";
             else ViewBag.Name = user.Name + " " + user.Surname;
         }
-
-        public IActionResult AllTrips()
-        {
-            if (!TripExists(1)) return NotFound();
-            else
-            {
-
-                return View(_context.Trip.ToList());
-            }
-        }
-
-        // GET: Trips
+        // GET: Trip
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Trip.ToListAsync());
+             var trips = await _context.Trip.Include(p => p.Office).Include(o => o.Office2).ToListAsync();
+             return View(trips);
         }
+        
 
-        // GET: Trips/Details/5
+        // GET: Trip/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -58,7 +48,7 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trip
+            var trip = await _context.Trip.Include(p => p.Office).Include(o => o.Office2)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (trip == null)
             {
@@ -68,30 +58,41 @@ namespace WebApplication.Controllers
             return View(trip);
         }
 
-        // GET: Trips/Create
+        // GET: Trip/Create
         public IActionResult Create()
         {
+            var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
+                           select new
+                           {
+                               ID = (int)t,
+                               Name = t.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Name");
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
             return View();
         }
 
-        // POST: Trips/Create
+        // POST: Trip/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Create(string fromOffice, string toOffice, Trip trip)
         {
-            if (ModelState.IsValid)
-            {
-                trip.TripStatus = 0;
-                _context.Add(trip);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(trip);
+            var officeFrom = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
+            trip.FromOffice = officeFrom.Id;
+            var officeTo = _context.Office.SingleOrDefault(x => x.Name == toOffice);
+            trip.ToOffice = officeTo.Id;
+            _context.Add(trip);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+            
         }
 
-        // GET: Trips/Edit/5
+        // GET: Trip/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,34 +101,47 @@ namespace WebApplication.Controllers
             }
 
             var trip = await _context.Trip.FindAsync(id);
+            var officeFrom = await _context.Office.FindAsync(trip.FromOffice);
+            trip.FromOffice = officeFrom.Id;
+            var officeTo = await _context.Office.FindAsync(trip.ToOffice);
+            trip.ToOffice = officeTo.Id;
             if (trip == null)
             {
                 return NotFound();
             }
+            var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
+                           select new
+                           {
+                               ID = (int)t,
+                               Name = t.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Name");
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
             return View(trip);
         }
 
-        // POST: Trips/Edit/5
+        // POST: Trip/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip)
         {
-            if (id != trip.Id)
+          
+            try
             {
-                return NotFound();
+                var officeFrom = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
+                trip.FromOffice = officeFrom.Id;
+                var officeTo = _context.Office.SingleOrDefault(x => x.Name == toOffice);
+                trip.ToOffice = officeTo.Id;
+                _context.Update(trip);
+                await _context.SaveChangesAsync();
             }
-
-            if (ModelState.IsValid)
+            catch (DbUpdateConcurrencyException)
             {
-                try
-                {
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
                     if (!TripExists(trip.Id))
                     {
                         return NotFound();
@@ -136,13 +150,11 @@ namespace WebApplication.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
             }
-            return View(trip);
-        }
+           return RedirectToAction(nameof(Index));
+    }
 
-        // GET: Trips/Delete/5
+        // GET: Trip/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,12 +164,32 @@ namespace WebApplication.Controllers
 
             var trip = await _context.Trip
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var officeFrom = await _context.Office.FindAsync(trip.FromOffice);
+            trip.FromOffice = officeFrom.Id;
+            var officeTo = await _context.Office.FindAsync(trip.ToOffice);
+            trip.ToOffice = officeTo.Id;
             if (trip == null)
             {
                 return NotFound();
             }
 
             return View(trip);
+        }
+
+        // POST: Trip/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var trip = await _context.Trip.FindAsync(id);
+            _context.Trip.Remove(trip);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool TripExists(int id)
+        {
+            return _context.Trip.Any(e => e.Id == id);
         }
 
         [HttpPost]
@@ -170,7 +202,7 @@ namespace WebApplication.Controllers
                 var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
                 if (v != null)
                 {
-                    
+
                     //v.Id = flightInformation.Id;
                     v.Id = v.Id;
                     v.TripId = flightInformation.TripId;
@@ -191,29 +223,11 @@ namespace WebApplication.Controllers
 
             return new JsonResult(status);
         }
-    
-
-    // POST: Trips/Delete/5
-    [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var trip = await _context.Trip.FindAsync(id);
-            _context.Trip.Remove(trip);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool TripExists(int id)
-        {
-            return _context.Trip.Any(e => e.Id == id);
-        }
-
         [HttpGet]
         public IActionResult GetTrip(int id)
         {
 
-            
+
             var trips = _context.Trip.ToList();
             var trip = trips.Where(t => t.Id == id).ToList();
             //var filtered_events = events.Where(x => x.UserId == id1).ToList();
@@ -233,9 +247,15 @@ namespace WebApplication.Controllers
 
             return new JsonResult(flight);
         }
-        public IActionResult AddTripView()
+        public List<SelectListItem> OfficeList()
         {
-            return View();
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            var offices = _context.Office.ToList();
+            foreach (var officeName in offices)
+            {
+                listItems.Add(new SelectListItem { Text = officeName.Name, Value = officeName.Name });
+            }
+            return listItems;
         }
     }
 }

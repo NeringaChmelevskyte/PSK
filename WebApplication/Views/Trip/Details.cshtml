@@ -1,0 +1,97 @@
+﻿@model Application.Entities.Trip
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Trip</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.End)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.End)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FromOffice)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FromOffice)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ToOffice)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ToOffice)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TripStatus)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TripStatus)
+        </dd>
+    </dl>
+</div>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Surname
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Role
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Participators)
+            {
+                <tr>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Surname
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>
+                    <td>
+                        @item.Role
+                    </td>
+                    <td>
+                        @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
