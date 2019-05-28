@@ -26,48 +26,67 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area=""  class="navbar-brand">WebApplication</a>
+                <a class="navbar-brand">Awesome application</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Users" asp-action="AllUsers">AllUsers</a></li>
 
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Users" asp-action="Home">@(ViewBag.Name != "" ? "Home" : "")</a></li>
+                @if (ViewBag.Role == Application.Entities.Roles.Admin)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Users" asp-action="AllUsers">AllUsers</a></li>
+                    </ul>
+                }
 
+                @if (ViewBag.Role != null)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Users" asp-action="Home">Home</a></li>
+                    </ul>
+                }
 
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">@(ViewBag.Name != "" ? "EmployeeHome" : "")</a></li>
+                @if (ViewBag.Role != null)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">EmployeeHome</a></li>
+                    </ul>
+                }
 
+                @if (ViewBag.Role == Application.Entities.Roles.Admin || ViewBag.Role == Application.Entities.Roles.Organizer)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="AllTrips" asp-action="Index">Trips</a></li>
+                    </ul>
+                }
 
-                </ul>
+                @if (ViewBag.Role == Application.Entities.Roles.Admin)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Apartments" asp-action="Index">Apartments</a></li>
+                    </ul>
+                }
 
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="AllTrips" asp-action="Index">@(ViewBag.Name != "" ? "Trips" : "")</a></li>
+                @if (ViewBag.Role == Application.Entities.Roles.Admin)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Trip" asp-action="Index">New Trip</a></li>
+                    </ul>
+                }
 
+                @if (ViewBag.Role != null)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Events" asp-action="Index">MyCalendar</a></li>
+                    </ul>
+                }
 
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Apartments" asp-action="Index">@(ViewBag.Name != "" ? "Apartments" : "")</a></li>
-
-
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Trip" asp-action="Index">@(ViewBag.Name != "" ? "New Trip" : "")</a></li>
-
-
-                </ul>
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Events" asp-action="Index">@(ViewBag.Name != "" ? "MyCalendar" : "")</a></li>
-
-                </ul>
-                <p class="navbar-text navbar-right">
-                    <a asp-area="" asp-controller="Users" asp-action="Logout">@(ViewBag.Name != "" ? "Logout" : "")</a>
-                </p>
-                <p class="navbar-text navbar-right">@ViewBag.Name</p>
-            </div>
+                @if (ViewBag.Role != null)
+                {
+                    <p class="navbar-text navbar-right">
+                        <a asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
+                    </p>
+                }
+                    <p class="navbar-text navbar-right">@ViewBag.Name</p>
+                </div>
         </div>
     </nav>
 

@@ -33,10 +33,15 @@ namespace WebApplication.Controllers
             base.OnActionExecuting(ctx);
             user = _us.GetUserFromRequest(Request);
             if (user == null)
+            {
                 ViewBag.Name = "";
+                ViewBag.Role = null;
+            }
+
             else
             {
                 ViewBag.Name = user.Name + " " + user.Surname;
+                ViewBag.Role = user.Role;
                 ViewBag.Id = user.Id;
             }
         }
