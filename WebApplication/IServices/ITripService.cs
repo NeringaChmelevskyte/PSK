@@ -11,5 +11,6 @@ namespace Application.IServices
     {
         void ApproveTripForUser(int tripId, int userId);
         void DeclineTripForUser(int tripId, int userId);
+        bool IsTripParticipatorsBusy(Trip trip);
     }
 }

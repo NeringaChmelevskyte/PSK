@@ -16,12 +16,14 @@ namespace WebApplication.Controllers
     {
         private readonly ApplicationDbContext _context;
         private IUserService _us;
+        private ITripService _ts;
         private User user;
         private static List<int> list;
-        public TripController(ApplicationDbContext context, IUserService us)
+        public TripController(ApplicationDbContext context, IUserService us, ITripService ts)
         {
             _context = context;
             _us = us;
+            _ts = ts;
         }
         public override void OnActionExecuting(ActionExecutingContext ctx)
         {
@@ -49,7 +51,6 @@ namespace WebApplication.Controllers
             {
                 list = new List<int>();
             }
-            Console.WriteLine(id);
             list.Add(id);
             ViewBag.list = list;
             var status = true;
@@ -113,12 +114,14 @@ namespace WebApplication.Controllers
         }
 
         // GET: Trip/Create
-        public IActionResult Create()
+        public IActionResult Create(string error = "")
         {
+            list = null;
             var offices = OfficeList();
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
+            ViewBag.Error = error;
             return View();
         }
 
@@ -127,40 +130,42 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string officeTitle1, string officeTitle2, Trip trip)
+        public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip)
         {
-
             var office1 = _context.Office.SingleOrDefault(x => x.Name == officeTitle1);
             var office2 = _context.Office.SingleOrDefault(x => x.Name == officeTitle2);
             trip.ToOffice = office2.Id;
             trip.FromOffice = office1.Id;
             trip.TripStatus = 0;
-            _context.Add(trip);
-            await _context.SaveChangesAsync();
-            Console.WriteLine(trip.Id);
 
             trip.Participators = new List<TripParticipator>();
             int i1 = 0;
+            if (list == null || list.Count() == 0)
+            {
+                return RedirectToAction(nameof(Create), new { error = "Kelionėje turi dalyvauti bent vienas dalyvis" });
+            }
             list = list.Distinct().ToList();
             foreach (int i in list)
             {
-
-                Console.WriteLine("cia musus elementas " + i);
                 TripParticipator participator = new TripParticipator();
                 participator.TripId = trip.Id;
                 participator.UserId = i;
                 participator.Approve = false;
-                if (i1 != i) { 
-                _context.Add(participator);
+                if (i1 != i) {
+                    trip.Participators.Add(participator);
                 }
                 i1 = i;
-                
             }
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-            
-            //return View(trip);
+            if (!_ts.IsTripParticipatorsBusy(trip))
+            {
+                _context.Add(trip);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return RedirectToAction(nameof(Create), new { error = "Pasirinkti dalyiai šiuo laiku užimti"});
+            }
         }
         public string GetOfficeName(int id)
         {
