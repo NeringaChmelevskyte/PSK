@@ -30,13 +30,6 @@
             </div>
             <div class="navbar-collapse collapse">
 
-                @if (ViewBag.Role == Application.Entities.Roles.Admin)
-                {
-                    <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Users" asp-action="AllUsers">AllUsers</a></li>
-                    </ul>
-                }
-
                 @if (ViewBag.Role != null)
                 {
                     <ul class="nav navbar-nav">
@@ -47,14 +40,21 @@
                 @if (ViewBag.Role != null)
                 {
                     <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">EmployeeHome</a></li>
+                        <li><a asp-area="" asp-controller="Events" asp-action="Index">MyCalendar</a></li>
                     </ul>
                 }
 
-                @if (ViewBag.Role == Application.Entities.Roles.Admin || ViewBag.Role == Application.Entities.Roles.Organizer)
+                @if (ViewBag.Role == Application.Entities.Roles.Admin)
                 {
                     <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Trip" asp-action="Index">Trips</a></li>
+                        <li><a asp-area="" asp-controller="Users" asp-action="AllUsers">AllUsers</a></li>
+                    </ul>
+                }
+
+                @if (ViewBag.Role != null)
+                {
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Employees" asp-action="HomePageView">EmployeeHome</a></li>
                     </ul>
                 }
 
@@ -68,14 +68,14 @@
                 @if (ViewBag.Role == Application.Entities.Roles.Admin || ViewBag.Role == Application.Entities.Roles.Organizer)
                 {
                     <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Trips" asp-action="Index">AllTrips</a></li>
+                        <li><a asp-area="" asp-controller="Trip" asp-action="Index">Trips</a></li>
                     </ul>
                 }
 
-                @if (ViewBag.Role != null)
+                @if (ViewBag.Role == Application.Entities.Roles.Admin || ViewBag.Role == Application.Entities.Roles.Organizer)
                 {
                     <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Events" asp-action="Index">MyCalendar</a></li>
+                        <li><a asp-area="" asp-controller="Trips" asp-action="Index">AllTrips</a></li>
                     </ul>
                 }
 
@@ -85,8 +85,8 @@
                         <a asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
                     </p>
                 }
-                    <p class="navbar-text navbar-right">@ViewBag.Name</p>
-                </div>
+                <p class="navbar-text navbar-right">@ViewBag.Name</p>
+            </div>
         </div>
     </nav>
 
