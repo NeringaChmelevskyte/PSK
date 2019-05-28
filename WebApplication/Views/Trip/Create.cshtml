@@ -6,6 +6,11 @@
 
 <h2>Create</h2>
 
+@if (ViewBag.Error != "")
+{
+    <p style="color:red">@ViewBag.Error</p>
+}
+
 <h4>Trip</h4>
 <form id="myform">
     <table class="table">

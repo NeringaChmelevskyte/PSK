@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using WebApplication.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Http;
+using Application.Entities;
 
 namespace Application.Services
 {
@@ -48,6 +49,24 @@ namespace Application.Services
                 _context.Update(trip);
             }
             _context.SaveChanges();
+        }
+
+        private bool DateIsBetween(DateTime date, DateTime first, DateTime second)
+        {
+            if (date > first && date < second) return true;
+            else return false;
+        }
+
+        public bool IsTripParticipatorsBusy(Trip trip)
+        {
+            bool busy = false;
+            foreach(TripParticipator human in trip.Participators)
+            {
+                var user = _context.Users.Where(i => i.Id == human.UserId).FirstOrDefault();
+                List<Event> userEvents = _context.Events.Where(x => x.UserId == user.Id && x.Start > DateTime.Now).ToList();
+                if (userEvents.Any(x => DateIsBetween(x.Start, trip.Start, trip.End) || DateIsBetween(x.End, trip.Start, trip.End))) busy = true;
+            }
+            return busy;
         }
     }
 }
