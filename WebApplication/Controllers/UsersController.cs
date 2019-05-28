@@ -19,11 +19,13 @@ namespace Application.Controllers
     public class UsersController : Controller
     {
         private IUserService _us;
+        private ITripService _ts;
         private User user;
 
-        public UsersController(IUserService us)
+        public UsersController(IUserService us, ITripService ts)
         {
             _us = us;
+            _ts = ts;
         }
         public override void OnActionExecuting(ActionExecutingContext ctx)
         {
@@ -84,25 +86,14 @@ namespace Application.Controllers
         [HttpPost]
         public JsonResult AddParticipant(int id)
         {
-            var list = _us.GetAllTripParticipators();
-            var list1 = list.Where(x => x.UserId == user.Id && x.TripId == id);
-            TripParticipator tp = list.FirstOrDefault(x => x.UserId == user.Id && x.TripId == id);
-            tp.Approve = true;
-            _us.UpdateTripParticipator(tp);
-            var status = true;
-
-            return new JsonResult(status);
+            _ts.ApproveTripForUser(id, user.Id);
+            return new JsonResult(true);
         }
         [HttpPost]
         public JsonResult RemoveParticipant(int id)
         {
-            var list = _us.GetAllTripParticipators();
-            var list1 = list.Where(x => x.UserId == user.Id && x.TripId == id);
-            TripParticipator tp = list.FirstOrDefault(x => x.UserId == user.Id && x.TripId == id);
-            _us.RemoveTripParticipator(tp);
-            var status = true;
-
-            return new JsonResult(status);
+            _ts.DeclineTripForUser(id, user.Id);
+            return new JsonResult(true);
         }
 
         [HttpPost]
