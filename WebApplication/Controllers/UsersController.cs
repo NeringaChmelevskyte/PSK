@@ -206,7 +206,11 @@ namespace Application.Controllers
         }
         public IActionResult LoginView()
         {
-            return View();
+            if(_us.GetUserFromRequest(Request) == null)
+            {
+                return View();
+            }
+            else return RedirectToAction("Home");
         }
     }
 }
