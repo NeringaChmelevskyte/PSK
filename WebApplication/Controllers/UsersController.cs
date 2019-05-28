@@ -32,17 +32,14 @@ namespace Application.Controllers
             if (user == null)
             {
                 ViewBag.Name = "";
-                ViewBag.Role = "";
+                ViewBag.Role = null;
             }
-            
+
             else
             {
-                
                 ViewBag.Name = user.Name + " " + user.Surname;
                 ViewBag.Role = user.Role;
-
             }
-
         }
 
         public IActionResult AllUsers()
@@ -206,7 +203,11 @@ namespace Application.Controllers
         }
         public IActionResult LoginView()
         {
-            return View();
+            if(_us.GetUserFromRequest(Request) == null)
+            {
+                return View();
+            }
+            else return RedirectToAction("Home");
         }
     }
 }
