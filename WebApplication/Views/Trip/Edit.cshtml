@@ -6,7 +6,7 @@
 
 <h2>Edit</h2>
 
-<h4>Trip</h4>
+<h4>@Model.Title</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -30,18 +30,18 @@
             </div>
             <div class="form-group">
                 <label asp-for="FromOffice" class="control-label"></label>
-                <input asp-for="FromOffice" class="form-control" />
-                <span asp-validation-for="FromOffice" class="text-danger"></span>
+                @Html.DropDownList("fromOffice", new SelectList(ViewBag.Offices))
+
             </div>
             <div class="form-group">
                 <label asp-for="ToOffice" class="control-label"></label>
-                <input asp-for="ToOffice" class="form-control" />
-                <span asp-validation-for="ToOffice" class="text-danger"></span>
+                @Html.DropDownList("toOffice", new SelectList(ViewBag.Offices))
+
             </div>
             <div class="form-group">
                 <label asp-for="TripStatus" class="control-label"></label>
-                <select asp-for="TripStatus" class="form-control"></select>
-                <span asp-validation-for="TripStatus" class="text-danger"></span>
+                @Html.DropDownListFor(model => model.TripStatus, ViewBag.EnumList as SelectList)
+
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
