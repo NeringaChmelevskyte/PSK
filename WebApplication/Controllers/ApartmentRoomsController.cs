@@ -43,8 +43,13 @@ namespace WebApplication.Controllers
         // GET: ApartmentRooms
         public async Task<IActionResult> Index(int apartment)
         {
-            //var rooms = await _context.ApartmentRoom.FirstOrDefaultAsync(a => a.ApartmentId == apartment.Id);
-            return View(await _context.ApartmentRoom.Include(p => p.Apartment).Where(a => a.ApartmentId == apartment).ToListAsync());
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin)
+            {
+                //var rooms = await _context.ApartmentRoom.FirstOrDefaultAsync(a => a.ApartmentId == apartment.Id);
+                return View(await _context.ApartmentRoom.Include(p => p.Apartment).Where(a => a.ApartmentId == apartment).ToListAsync());
+            }
+            else { return View("_NotFound"); }
         }
 
         // GET: ApartmentRooms/Details/5
@@ -62,17 +67,20 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return View(apartmentRoom);
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(apartmentRoom); }
+            else { return View("_NotFound"); }
         }
 
         // GET: ApartmentRooms/Create
         public IActionResult Create()
         {
+            var user = _us.GetUserFromRequest(Request);
             var apartments = ApartmentsList();
             var values = from ap in apartments
                          select ap.Text;
             ViewBag.Apartaments = values;
-            return View();
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(); }
+            else { return View("_NotFound"); }
         }
 
         // POST: ApartmentRooms/Create
@@ -109,7 +117,9 @@ namespace WebApplication.Controllers
             var values = from ap in apartments
                          select ap.Text;
             ViewBag.Apartaments = values;
-            return View(apartmentRoom);
+
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(apartmentRoom); }
+            else { return View("_NotFound"); }
         }
 
         // POST: ApartmentRooms/Edit/5
@@ -158,7 +168,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return View(apartmentRoom);
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(apartmentRoom); }
+            else { return View("_NotFound"); }
         }
 
         // POST: ApartmentRooms/Delete/5

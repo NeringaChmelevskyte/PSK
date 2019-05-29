@@ -50,8 +50,13 @@ namespace WebApplication.Controllers
 
         public async Task<IActionResult> Index(int id)
         {
-            id1 = id;
-            return View(await _context.Events.ToListAsync());
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null)
+            {
+                id1 = id;
+                return View(await _context.Events.ToListAsync());
+            }
+            else { return View("_NotFound"); }
         }
 
         [HttpGet]
