@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace Application.Entities
         [Required]
         public DateTime End { get; set; }
 
+        [DisplayName("Car rent status")]
         public CarRentalEnum CarRental { get; set; }
 
     }

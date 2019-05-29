@@ -1,46 +1,66 @@
 ﻿@model IEnumerable<Application.Entities.Trip>
 
-    @{
-        ViewData["Title"] = "Index";
-    }
+@{
+    ViewData["Title"] = "Index";
+}
 
-    <h2>Index</h2>
+<h2>Trips</h2>
 
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Start)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.End)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FromOffice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ToOffice)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TripStatus)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+@using (Html.BeginForm())
+{
+    <div>
+
+        @Html.ValidationSummary()
+
+    </div>
+    <div style="float:right;">
+        <input type="submit" value="Merge trips" formaction=@Url.Action("Merge", "Trip") formmethod="post" />
+    </div>
+
+@*<p class="right">
+        <a asp-action="Merge">Merge trips</a>
+    </p>*@
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.End)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FromOffice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ToOffice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TripStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @foreach (var item1 in ViewBag.offices)
             {
-                @foreach (var item1 in ViewBag.offices) {
-                    if (item1.Id == item.FromOffice) { ViewData["Name1"] = item1.Name; }
-                    if (item1.Id == item.ToOffice) { ViewData["Name2"] = item1.Name; }
-                }
+                if (item1.Id == item.FromOffice) { ViewData["Name1"] = item1.Name; }
+                if (item1.Id == item.ToOffice) { ViewData["Name2"] = item1.Name; }
+            }
             <tr>
+                <td>
+                    <input type="checkbox" name="mergeInputs" value="@item.Id" />
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
@@ -66,5 +86,6 @@
                 </td>
             </tr>
         }
-        </tbody>
-    </table>
+    </tbody>
+</table>
+}
