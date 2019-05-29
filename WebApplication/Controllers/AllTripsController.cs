@@ -44,8 +44,10 @@ namespace WebApplication.Controllers
         // GET: Trip
         public async Task<IActionResult> Index()
         {
+            var user = _us.GetUserFromRequest(Request);
              var trips = await _context.Trip.Include(p => p.Office).Include(o => o.Office2).ToListAsync();
-             return View(trips);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trips); }
+            else { return View("_NotFound"); }
         }
         
 
@@ -64,7 +66,9 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return View(trip);
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+            else { return View("_NotFound"); }
         }
 
         // GET: Trip/Create
@@ -81,7 +85,9 @@ namespace WebApplication.Controllers
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
-            return View();
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(); }
+            else { return View("_NotFound"); } 
         }
 
         // POST: Trip/Create
@@ -129,7 +135,10 @@ namespace WebApplication.Controllers
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
-            return View(trip);
+
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Trip/Edit/5
@@ -182,7 +191,9 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return View(trip);
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Trip/Delete/5
