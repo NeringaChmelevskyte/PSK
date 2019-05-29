@@ -131,7 +131,8 @@ namespace Application.Controllers
             }
             else
             {
-                return Unauthorized();
+                //return Unauthorized();
+                return View("_NotFound");
             }
 
         }
@@ -146,8 +147,18 @@ namespace Application.Controllers
         [HttpPost]
         public ActionResult RemoveUser(int id)
         {
-            _us.RemoveUser(id);
-            return RedirectToAction("AllUsers", "Users");
+            var user = _us.GetUser(id);
+            var current_user= _us.GetUserFromRequest(Request);
+            if (user != current_user)
+            {
+                _us.RemoveUser(id);
+                return RedirectToAction("AllUsers", "Users");
+            }
+            else
+            {
+                _us.RemoveUser(id);
+                return RedirectToAction("LoginView");
+            }
         }
 
         [HttpPost]
