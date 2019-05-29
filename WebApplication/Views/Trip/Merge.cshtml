@@ -1,0 +1,126 @@
+﻿@model Application.Entities.Trip
+
+@{
+    ViewData["Title"] = "Merge";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var trips = TempData["trips"] as List<Application.Entities.Trip>;
+
+}
+
+<h2>Chosen trips:</h2>
+@using (Html.BeginForm())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().Start)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().End)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().TripStatus)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().FromOffice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => trips.FirstOrDefault().ToOffice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in trips)
+            {
+                <tr>                   
+                    <td>
+                        <input type="hidden" name="trips" value="@item.Id" />
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Start)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.End)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TripStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Office.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Office2.Name)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @*@{TempData["tripData"] = trips;}*@
+    <h2>Enter details to merge chosen trips into one</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="MergeSelectedTrips">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Start" class="control-label"></label>
+                    <input asp-for="Start" class="form-control" />
+                    <span asp-validation-for="Start" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="End" class="control-label"></label>
+                    <input asp-for="End" class="form-control" />
+                    <span asp-validation-for="End" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="FromOffice" class="control-label"></label>
+                    @Html.DropDownList("fromOffice", new SelectList(ViewBag.Offices))
+
+                </div>
+                <div class="form-group">
+                    <label asp-for="ToOffice" class="control-label"></label>
+                    @Html.DropDownList("toOffice", new SelectList(ViewBag.Offices))
+
+                </div>
+                <div class="form-group">
+                    <label asp-for="TripStatus" class="control-label"></label>
+                    @Html.DropDownListFor(model => model.TripStatus, ViewBag.EnumList as SelectList)
+
+                </div>
+                @*<div class="form-group">
+                        @{
+                            List<Application.Entities.Trip> tripsData = new List<Application.Entities.Trip>();
+                            foreach(var i in trips)
+                            {
+                                tripsData.Add(i);
+                            }
+
+                        }
+                        <input type="hidden" name="trips" value="@tripsData" />
+                    </div>*@
+                <div class="form-group">
+                    <input type="submit" value="Create" formaction=@Url.Action("MergeSelectedTrips", "Trip") formmethod="post" class="btn btn-default" />
+                </div>
+            </form>
+        </div>
+    </div>
+}
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+    @*<div>
+            @{await Html.RenderPartialAsync("MergeEditView", Model); }
+        </div>*@
