@@ -213,7 +213,18 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
-
+            var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
+                           select new
+                           {
+                               ID = (int)t,
+                               Name = t.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Name");
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
+            ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired };
             var user = _us.GetUserFromRequest(Request);
             if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
             else { return View("_NotFound"); }
@@ -224,19 +235,22 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip, TicketStatusEnum ticketStatus)
         {
-            if (id != trip.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
+            
                 try
                 {
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
+                var office1 = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
+                var office2 = _context.Office.SingleOrDefault(x => x.Name == toOffice);
+                trip.ToOffice = office2.Id;
+                trip.FromOffice = office1.Id;
+
+                user = _us.GetUserFromRequest(Request);
+                trip.Organizator = user.Id;
+                _context.Update(trip);
+                var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
+                _context.Update(flightInfo);
+                await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -249,9 +263,8 @@ namespace WebApplication.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(trip);
+                
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Trip/Delete/5
@@ -264,6 +277,10 @@ namespace WebApplication.Controllers
 
             var trip = await _context.Trip
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var officeFrom = await _context.Office.FindAsync(trip.FromOffice);
+            trip.Office = officeFrom;
+            var officeTo = await _context.Office.FindAsync(trip.ToOffice);
+            trip.Office2 = officeTo;
             if (trip == null)
             {
                 return NotFound();
@@ -360,7 +377,7 @@ namespace WebApplication.Controllers
             {
 
                 ModelState.AddModelError("", "None of the records has been selected for merge action !");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
             List<Trip> trips = new List<Trip>();
             var i = 0;
