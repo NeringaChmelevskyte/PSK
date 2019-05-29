@@ -91,6 +91,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
+            var flight = await _context.FlightInformation.FirstOrDefaultAsync(f => f.TripId == id);
+
             var trip = await _context.Trip.FirstOrDefaultAsync(m => m.Id == id);
             if (trip == null)
             {
@@ -110,6 +112,8 @@ namespace WebApplication.Controllers
                 }
             }
             ViewBag.Participators=list3;
+            ViewBag.FlightId = flight.Id;
+            ViewBag.FlightTicketStatus = flight.FlightTicketStatus;
             return View(trip);
         }
 
@@ -121,6 +125,7 @@ namespace WebApplication.Controllers
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
+            ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired};
             ViewBag.Error = error;
             return View();
         }
@@ -130,7 +135,7 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip)
+        public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip, TicketStatusEnum ticketStatus)
         {
             var office1 = _context.Office.SingleOrDefault(x => x.Name == officeTitle1);
             var office2 = _context.Office.SingleOrDefault(x => x.Name == officeTitle2);
@@ -171,6 +176,10 @@ namespace WebApplication.Controllers
             if (!_ts.IsTripParticipatorsBusy(trip))
             {
                 _context.Add(trip);
+                _context.SaveChanges();
+
+                var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
+                _context.Add(flightInfo);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }

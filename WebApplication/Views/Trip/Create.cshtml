@@ -80,7 +80,8 @@
                 @Html.DropDownList("officeTitle2", new SelectList(ViewBag.Offices))
             </div>
             <div>
-
+                 <label class="control-label">Flight tickets status</label>
+                 @Html.DropDownList("ticketStatus", new SelectList(ViewBag.FlightTicketStatus))
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
