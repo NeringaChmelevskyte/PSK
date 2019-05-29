@@ -143,7 +143,12 @@ namespace WebApplication.Controllers
             trip.FromOffice = office1.Id;
             trip.TripStatus = 0;
 
-            
+            user = _us.GetUserFromRequest(Request);
+            trip.Organizator = user.Id;
+            _context.Add(trip);
+            //await _context.SaveChangesAsync();
+            Console.WriteLine(trip.Id);
+
 
             trip.Participators = new List<TripParticipator>();
             int i1 = 0;
@@ -162,6 +167,11 @@ namespace WebApplication.Controllers
                     trip.Participators.Add(participator);
                 }
                 i1 = i;
+
+              
+                trip.Participators.Add(participator);
+                //_context.Add(participator);
+
             }
             if (!_ts.IsTripParticipatorsBusy(trip))
             {
@@ -327,6 +337,88 @@ namespace WebApplication.Controllers
         public IActionResult AddTripView()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Merge(int[] mergeInputs)
+        {
+
+            if (mergeInputs == null)
+            {
+
+                ModelState.AddModelError("", "None of the records has been selected for merge action !");
+                return View(nameof(Index));
+            }
+            List<Trip> trips = new List<Trip>();
+            var i = 0;
+            foreach (var item in mergeInputs)
+            {
+                   trips.Add(await _context.Trip.FindAsync(item));
+                   trips[i].Office = _context.Office.SingleOrDefault(x => x.Id == trips[i].FromOffice);
+                   trips[i].Office2 = _context.Office.SingleOrDefault(x => x.Id == trips[i].ToOffice);
+
+                    i++;
+            }
+            TempData ["trips"] = trips; 
+            var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
+                           select new
+                           {
+                               ID = (int)t,
+                               Name = t.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Name");
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
+            return View(trips.FirstOrDefault());
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> MergeSelectedTrips(string fromOffice, string toOffice, int[] trips, Trip trip)
+        {
+            var office1 = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
+            var office2 = _context.Office.SingleOrDefault(x => x.Name == toOffice);
+            trip.ToOffice = office2.Id;
+            trip.FromOffice = office1.Id;
+            user = _us.GetUserFromRequest(Request);
+            trip.Organizator = user.Id;
+            _context.Add(trip);
+
+            List<TripParticipator> participators = new List<TripParticipator>();
+
+            foreach (var i in trips)
+            {
+                List<TripParticipator> list2 = _context.TripParticipators.Where(x => x.TripId == i).ToList();
+                var removeTrip = await _context.Trip.FindAsync(i);
+
+                foreach (var p in list2)
+                {
+                    
+                    TripParticipator tp = new TripParticipator();
+                    tp.TripId = trip.Id;
+                    tp.Trip = trip;
+                    tp.UserId = p.UserId;
+                    tp.User = p.User;
+                    _context.Remove(p);
+                    TripParticipator trPr = await _context.TripParticipators.FindAsync(tp.TripId, tp.UserId);
+                    if (trPr == null)
+                    {
+                        
+                            participators.Add(p);
+                            _context.Add(tp);                       
+                    }
+                    
+                }
+                _context.Remove(removeTrip);
+                await _context.SaveChangesAsync();
+
+            }
+            
+            trip.Participators = participators;
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

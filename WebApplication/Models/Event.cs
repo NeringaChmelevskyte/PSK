@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,8 +27,10 @@ namespace Application.Entities
         [Required]
         public DateTime End { get; set; }
         [Required]
+        [DisplayName("Theme color")]
         public string ThemeColor { get; set; }
         [Required]
+        [DisplayName("Is full day")]
         public bool IsFullDay { get; set; }
         [Required]
         public int UserId { get; set; }
