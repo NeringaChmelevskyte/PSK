@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using ForeignKeyAttribute = System.ComponentModel.DataAnnotations.ForeignKeyAttribute;
 
 namespace Application.Entities
 {
@@ -38,12 +37,12 @@ namespace Application.Entities
         public DateTime End { get; set; }
 
         [Required]
-        [ForeignKey("Office")]
+        //[ForeignKey("Office")]
         [DisplayName("From office")]
         public int FromOffice { get; set; }
 
         [Required]
-        [ForeignKey("Office2")]
+        //[ForeignKey("Office2")]
         [DisplayName("To office")]
         public int ToOffice { get; set; }
 
