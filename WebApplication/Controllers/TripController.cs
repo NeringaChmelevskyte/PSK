@@ -213,6 +213,8 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
+            ViewBag.DefaultOfficeFrom = _context.Office.Find(trip.FromOffice).Name;
+            ViewBag.DefaultOfficeTo = _context.Office.Find(trip.ToOffice).Name;
             var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
                            select new
                            {
@@ -225,6 +227,7 @@ namespace WebApplication.Controllers
                          select ofc.Text;
             ViewBag.Offices = values;
             ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired };
+            ViewBag.DefaultFlightTicketStatus = _context.FlightInformation.Single(a => a.TripId == trip.Id).FlightTicketStatus;
             var user = _us.GetUserFromRequest(Request);
             if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
             else { return View("_NotFound"); }
@@ -248,11 +251,9 @@ namespace WebApplication.Controllers
                 user = _us.GetUserFromRequest(Request);
                 trip.Organizator = user.Id;
                 _context.Update(trip);
-                var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
-                _context.Update(flightInfo);
                 await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException a)
                 {
                     if (!TripExists(trip.Id))
                     {
@@ -262,8 +263,11 @@ namespace WebApplication.Controllers
                     {
                         throw;
                     }
-                }
-                
+            }
+            var flightInfo = _context.FlightInformation.Single(a => a.TripId == trip.Id);
+            flightInfo.FlightTicketStatus = ticketStatus;
+            _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
