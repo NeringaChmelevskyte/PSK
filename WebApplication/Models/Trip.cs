@@ -57,6 +57,9 @@ namespace Application.Entities
         public virtual Office Office2 { get; set; }
 
 
+        [ConcurrencyCheck]
+        [Timestamp]
+        public byte[] Version { get; set; }
 
 
     }

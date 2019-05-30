@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Filters;
+using WebApplication.Interceptors;
 
 namespace Application.Controllers
 {
@@ -46,35 +47,50 @@ namespace Application.Controllers
 
         public IActionResult AllUsers()
         {
-            var users = Get();
-            return View(users);
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin)
+            {
+                var users = Get();
+                return View(users);
+            }
+            else
+            {
+                return View("_NotFound");
+            }
         }
+        [ServiceFilter(typeof(LoggedInterceptor))]
         public IActionResult Home()
         {
-            ViewBag.Trips = null;
-            ViewBag.Offices = _us.GetAllOffices();
-            var trips = _us.GetAllTrips();
-            var tpList = _us.GetAllTripParticipators();
-            var list = tpList.Where(x => x.UserId == user.Id && x.Approve == false);
-            foreach (TripParticipator tp in tpList)
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null)
             {
-                Console.WriteLine(tp.UserId + "  :  " + tp.TripId);
-            }
-            List<Trip> list1 = new List<Trip>();
-            foreach (TripParticipator tp in list)
-            {
-                foreach (Trip t in trips)
-                {
-                    if (tp.TripId == t.Id)
-                    {
-                        list1.Add(t);
-                    }
-                }
 
+                ViewBag.Trips = null;
+                ViewBag.Offices = _us.GetAllOffices();
+                var trips = _us.GetAllTrips();
+                var tpList = _us.GetAllTripParticipators();
+                var list = tpList.Where(x => x.UserId == user.Id && x.Approve == false);
+                foreach (TripParticipator tp in tpList)
+                {
+                    Console.WriteLine(tp.UserId + "  :  " + tp.TripId);
+                }
+                List<Trip> list1 = new List<Trip>();
+                foreach (TripParticipator tp in list)
+                {
+                    foreach (Trip t in trips)
+                    {
+                        if (tp.TripId == t.Id)
+                        {
+                            list1.Add(t);
+                        }
+                    }
+
+                }
+                ViewBag.Trips = list1;
+                var users = Get();
+                return View(users);
             }
-            ViewBag.Trips = list1;
-            var users = Get();
-            return View(users);
+            else { return View("_NotFound"); }
         }
 
         [HttpGet]
@@ -122,16 +138,12 @@ namespace Application.Controllers
                 options.Expires = token.ValidTo;
                 Response.Cookies.Append("token", stringToken, options);
 
-                if (user.Role is 0)
-                {
-                    return RedirectToAction("AllUsers", "Users");
-                }
-                else return RedirectToAction("Home", "Users");
+                return RedirectToAction("Home", "Users");
 
             }
             else
             {
-                return Unauthorized();
+                return View("_NotFound");
             }
 
         }
@@ -146,8 +158,18 @@ namespace Application.Controllers
         [HttpPost]
         public ActionResult RemoveUser(int id)
         {
-            _us.RemoveUser(id);
-            return RedirectToAction("AllUsers", "Users");
+            var user = _us.GetUser(id);
+            var current_user= _us.GetUserFromRequest(Request);
+            if (user != current_user)
+            {
+                _us.RemoveUser(id);
+                return RedirectToAction("AllUsers", "Users");
+            }
+            else
+            {
+                _us.RemoveUser(id);
+                return RedirectToAction("LoginView");
+            }
         }
 
         [HttpPost]
@@ -159,6 +181,7 @@ namespace Application.Controllers
         
         public IActionResult AddUserView()
         {
+            var user = _us.GetUserFromRequest(Request);
             var enumData = from Roles r in Enum.GetValues(typeof(Roles))
                            select new
                            {
@@ -166,13 +189,19 @@ namespace Application.Controllers
                                Title = r.ToString()
                            };
             ViewBag.EnumList = new SelectList(enumData, "ID", "Title");
-            return View();
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(); }
+            else { return View("_NotFound"); }
         }
 
         public IActionResult DeleteView(int? id)
         {
-            var user= Get().Where(x => x.Id == id);
-            return View(user.SingleOrDefault());
+            var current_user = _us.GetUserFromRequest(Request);
+            if (current_user != null && ViewBag.Role == Roles.Admin)
+            {
+                var user = Get().Where(x => x.Id == id);
+                return View(user.SingleOrDefault());
+            }
+            else { return View("_NotFound"); }
         }
 
         public IActionResult EditUserView(User user)

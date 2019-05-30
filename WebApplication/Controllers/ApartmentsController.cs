@@ -43,7 +43,9 @@ namespace WebApplication.Controllers
         // GET: Apartments
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Apartment.Include(p => p.Office).ToListAsync());
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(await _context.Apartment.Include(p => p.Office).ToListAsync()); }
+            else { return View("_NotFound"); }
         }
 
         // GET: Apartments/Details/5
@@ -60,18 +62,22 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
-            
-            return RedirectToAction("Index", "ApartmentRooms", new {apartment = apartment.Id});
+
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin) { return RedirectToAction("Index", "ApartmentRooms", new { apartment = apartment.Id }); }
+            else { return View("_NotFound"); }
         }
 
         // GET: Apartments/Create
         public IActionResult Create()
         {
+            var user = _us.GetUserFromRequest(Request);
             var offices = OfficeList();
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
-            return View();
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Apartments/Create
@@ -109,7 +115,10 @@ namespace WebApplication.Controllers
             var values = from ofc in offices
                          select ofc.Text;
             ViewBag.Offices = values;
-            return View(apartment);
+
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(apartment); }
+            else { return View("_NotFound"); }
         }
 
         [HttpPost]
@@ -155,7 +164,8 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return View(apartment);
+            if (user != null && ViewBag.Role == Roles.Admin) { return View(apartment); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Apartments/Delete/5

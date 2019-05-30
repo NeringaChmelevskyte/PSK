@@ -80,7 +80,10 @@ namespace WebApplication.Controllers
         // GET: Trip
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Trip.ToListAsync());
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer)
+            { return View(await _context.Trip.ToListAsync()); }
+            else { return View("_NotFound"); }
         }
 
         // GET: Trip/Details/5
@@ -117,12 +120,17 @@ namespace WebApplication.Controllers
             //ViewBag.FlightId = flight.Id;
             ViewBag.FlightTicketStatus = flight.FlightTicketStatus;
 
+
             //ViewBag.CarRentalId = carRental.Id;
             ViewBag.CarRental = carRental.CarRental;
 
             ViewBag.AccomodationStatus = accomodationInfo.AccomodationStatus;
 
-            return View(trip);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { 
+            return View(trip); 
+            }
+            else { return View("_NotFound"); }
+
         }
 
         // GET: Trip/Create
@@ -137,7 +145,9 @@ namespace WebApplication.Controllers
             ViewBag.carRental = new List<CarRentalEnum>() { CarRentalEnum.Required, CarRentalEnum.NotRequired };
             ViewBag.AccomodationStatus = new List<AccomodationStatusEnum> { AccomodationStatusEnum.Required, AccomodationStatusEnum.NotRequired };
             ViewBag.Error = error;
-            return View();
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer)
+            { return View(); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Trip/Create
@@ -221,7 +231,24 @@ namespace WebApplication.Controllers
             {
                 return NotFound();
             }
-            return View(trip);
+            ViewBag.DefaultOfficeFrom = _context.Office.Find(trip.FromOffice).Name;
+            ViewBag.DefaultOfficeTo = _context.Office.Find(trip.ToOffice).Name;
+            var enumData = from TripStatusEnum t in Enum.GetValues(typeof(TripStatusEnum))
+                           select new
+                           {
+                               ID = (int)t,
+                               Name = t.ToString()
+                           };
+            ViewBag.EnumList = new SelectList(enumData, "ID", "Name");
+            var offices = OfficeList();
+            var values = from ofc in offices
+                         select ofc.Text;
+            ViewBag.Offices = values;
+            ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired };
+            ViewBag.DefaultFlightTicketStatus = _context.FlightInformation.Single(a => a.TripId == trip.Id).FlightTicketStatus;
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Trip/Edit/5
@@ -229,21 +256,22 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Start,End,FromOffice,ToOffice,TripStatus")] Trip trip)
+        public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip, TicketStatusEnum ticketStatus)
         {
-            if (id != trip.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
+            
                 try
                 {
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
+                var office1 = _context.Office.SingleOrDefault(x => x.Name == fromOffice);
+                var office2 = _context.Office.SingleOrDefault(x => x.Name == toOffice);
+                trip.ToOffice = office2.Id;
+                trip.FromOffice = office1.Id;
+
+                user = _us.GetUserFromRequest(Request);
+                trip.Organizator = user.Id;
+                _context.Update(trip);
+                await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException a)
                 {
                     if (!TripExists(trip.Id))
                     {
@@ -253,10 +281,12 @@ namespace WebApplication.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
             }
-            return View(trip);
+            var flightInfo = _context.FlightInformation.Single(a => a.TripId == trip.Id);
+            flightInfo.FlightTicketStatus = ticketStatus;
+            _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Trip/Delete/5
@@ -269,12 +299,17 @@ namespace WebApplication.Controllers
 
             var trip = await _context.Trip
                 .FirstOrDefaultAsync(m => m.Id == id);
+            var officeFrom = await _context.Office.FindAsync(trip.FromOffice);
+            trip.Office = officeFrom;
+            var officeTo = await _context.Office.FindAsync(trip.ToOffice);
+            trip.Office2 = officeTo;
             if (trip == null)
             {
                 return NotFound();
             }
 
-            return View(trip);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+            else { return View("_NotFound"); }
         }
 
         // POST: Trip/Delete/5
@@ -361,7 +396,9 @@ namespace WebApplication.Controllers
         }
         public IActionResult AddTripView()
         {
-            return View();
+            var user = _us.GetUserFromRequest(Request);
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(); }
+            else { return View("_NotFound"); }
         }
 
         [HttpPost]
@@ -372,7 +409,7 @@ namespace WebApplication.Controllers
             {
 
                 ModelState.AddModelError("", "None of the records has been selected for merge action !");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
             List<Trip> trips = new List<Trip>();
             var i = 0;
@@ -441,8 +478,11 @@ namespace WebApplication.Controllers
             }
             
             trip.Participators = participators;
-            
+
+            _context.Add(new FlightInformation { FlightTicketStatus = TicketStatusEnum.NotRequired, TripId = trip.Id});
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }
