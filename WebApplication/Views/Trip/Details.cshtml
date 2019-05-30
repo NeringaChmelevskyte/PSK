@@ -59,13 +59,16 @@
         <dd>
             @ViewBag.FlightTicketStatus
         </dd>
-        <dd>
-            @*@Html.ActionLink("Add flight", "Create", "FlightInformationController")*@
-            <a asp-controller="FlightInformation" asp-action="Create" asp-route-id="@Model.Id">Add/Change flight</a>
-        </dd>
-        <dd>
-            <a asp-controller="FlightInformation" asp-action="Details" asp-route-id="@Model.Id">Show flight Info</a>
-        </dd>
+        @if (ViewBag.FlightTicketStatus != Application.Entities.TicketStatusEnum.NotRequired)
+        {
+            <dd>
+                @*@Html.ActionLink("Add flight", "Create", "FlightInformationController")*@
+                <a asp-controller="FlightInformation" asp-action="Create" asp-route-id="@Model.Id">Add/Change flight</a>
+            </dd>
+            <dd>
+                <a asp-controller="FlightInformation" asp-action="Details" asp-route-id="@Model.Id">Show flight Info</a>
+            </dd>
+        }
     </dl>
 </div>
 <div>

@@ -136,16 +136,11 @@ namespace Application.Controllers
                 options.Expires = token.ValidTo;
                 Response.Cookies.Append("token", stringToken, options);
 
-                if (user.Role is 0)
-                {
-                    return RedirectToAction("AllUsers", "Users");
-                }
-                else return RedirectToAction("Home", "Users");
+                return RedirectToAction("Home", "Users");
 
             }
             else
             {
-                //return Unauthorized();
                 return View("_NotFound");
             }
 
