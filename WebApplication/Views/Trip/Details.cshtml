@@ -86,7 +86,7 @@
 
                 </dd>
             }
-            @if (ViewBag.CarReantal == Application.Entities.CarRentalEnum.Booked)
+            @if (ViewBag.CarRental == Application.Entities.CarRentalEnum.Booked)
             {
                 <dd>
                     <a asp-controller="RentalCarInformation" asp-action="Details" asp-route-id="@Model.Id">Show rental car Info</a>
