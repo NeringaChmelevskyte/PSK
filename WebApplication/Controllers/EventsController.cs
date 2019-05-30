@@ -25,7 +25,6 @@ namespace WebApplication.Controllers
         public EventsController(ApplicationDbContext context, IUserService us)
         {
             _context = context;
-            _context = context;
             _us = us;
         }
         public override void OnActionExecuting(ActionExecutingContext ctx)
