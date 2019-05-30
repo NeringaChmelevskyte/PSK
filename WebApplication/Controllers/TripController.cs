@@ -283,7 +283,19 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var trip = await _context.Trip.FindAsync(id);
+            var flightInformation = _context.FlightInformation.Single(f => f.TripId == id);
+            var rentalCarInformation = _context.RentalCarInformation.Single(r => r.TripId == id);
+            var accomodationInfo = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
+
             _context.Trip.Remove(trip);
+            _context.FlightInformation.Remove(flightInformation);
+            _context.RentalCarInformation.Remove(rentalCarInformation);
+
+            foreach( AccomodationInfo accomodation in accomodationInfo)
+            {
+                _context.AccomodationInfo.Remove(accomodation);
+            }
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
