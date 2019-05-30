@@ -30,12 +30,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="FromOffice" class="control-label"></label>
-                @Html.DropDownList("fromOffice", new SelectList(ViewBag.Offices))
+                @Html.DropDownList("fromOffice", new SelectList(ViewBag.Offices, ViewBag.DefaultOfficeFrom))
 
             </div>
             <div class="form-group">
                 <label asp-for="ToOffice" class="control-label"></label>
-                @Html.DropDownList("toOffice", new SelectList(ViewBag.Offices))
+                @Html.DropDownList("toOffice", new SelectList(ViewBag.Offices, ViewBag.DefaultOfficeTo))
 
             </div>
             <div class="form-group">
@@ -45,8 +45,9 @@
             </div>
             <div>
                 <label class="control-label">Flight tickets status</label>
-                @Html.DropDownList("ticketStatus", new SelectList(ViewBag.FlightTicketStatus))
+                @Html.DropDownList("ticketStatus", new SelectList(ViewBag.FlightTicketStatus, ViewBag.DefaultFlightTicketStatus))
             </div>
+            @Html.HiddenFor(model => model.Version)
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
