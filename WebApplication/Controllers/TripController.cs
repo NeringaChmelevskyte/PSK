@@ -450,8 +450,11 @@ namespace WebApplication.Controllers
             }
             
             trip.Participators = participators;
-            
+
+            _context.Add(new FlightInformation { FlightTicketStatus = TicketStatusEnum.NotRequired, TripId = trip.Id});
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }
