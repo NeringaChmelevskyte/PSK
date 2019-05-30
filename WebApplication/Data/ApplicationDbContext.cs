@@ -13,6 +13,8 @@ namespace Application
         public DbSet<Event> Events { get; set; }
         public DbSet<ActiveToken> ActiveTokens { get; set; }
         public DbSet<FlightInformation> FlightInformation { get; set; }
+        public DbSet<RentalCarInformation> RentalCarInformation { get; set; }
+        public DbSet<AccomodationInfo> AccomodationInfo { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

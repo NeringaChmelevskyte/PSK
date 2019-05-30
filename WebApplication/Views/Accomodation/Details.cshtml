@@ -1,0 +1,103 @@
+﻿@model Int32
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<h4>AccomodationInfo</h4>
+<hr />
+<div>
+    <h4>Accomodation for selected trip</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @foreach (Application.Entities.AccomodationInfo accom in ViewBag.Accomodations)
+        {
+            @*<div class="row">
+                <div class="col-md-4">
+                    <form asp-action="Details">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="Cost" class="control-label"></label>
+                            <input asp-for="Cost" class="form-control" />
+                            <span asp-validation-for="Cost" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Start" class="control-label"></label>
+                            <input asp-for="Start" class="form-control" />
+                            <span asp-validation-for="Start" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="End" class="control-label"></label>
+                            <input asp-for="End" class="form-control" />
+                            <span asp-validation-for="End" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AccomodationStatus" class="control-label"></label>
+                            <input asp-for="AccomodationStatus" class="form-control" />
+                            <span asp-validation-for="AccomodationStatus" class="text-danger"></span>
+                        </div>
+
+                    </form>
+                </div>
+            </div>*@
+
+            @if (accom.HotelName != null)
+            {
+                <dt>
+                    Hotel name
+                </dt>
+                <dd>
+                    @accom.HotelName
+                </dd>
+                <dt>
+                    Cost
+                </dt>
+                <dd>
+                    @accom.Cost
+                </dd>
+            }
+            else
+            {
+                <dt>
+                    ApartmentRoomId
+                </dt>
+                <dd>
+                    @accom.ApartmentRoomId
+                </dd>
+            }
+            <dt>
+                UserId
+            </dt>
+            <dd>
+                @accom.UserId
+            </dd>
+            <dt>
+                Start
+            </dt>
+            <dd>
+                @accom.Start
+            </dd>
+            <dt>
+                End
+            </dt>
+            <dd>
+                @accom.End
+            </dd>
+            <br />
+
+
+
+
+        }
+    </dl>
+</div>
+    <div>
+
+        <a asp-action="Details" asp-controller="Trip" asp-route-id="@Model">Back to trip</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

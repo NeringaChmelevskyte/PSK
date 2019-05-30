@@ -1,4 +1,4 @@
-﻿@model Application.Entities.FlightInformation
+﻿@model Application.Entities.AccomodationInfo
 
 @{
     ViewData["Title"] = "Create";
@@ -6,22 +6,41 @@
 
 <h2>Create</h2>
 
-<h4>FlightInformation</h4>
+<h4>Accomodation information</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
+        @if (ViewBag.HotelRequired == true)
+        {
+        <u>There are no available rooms at specified dates, please insert hotel name and cost</u>
+        }
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                @*<label asp-for="TripId" class="control-label"></label>
+            <input asp-for="TripId" class="form-control" />
+            <span asp-validation-for="TripId" class="text-danger"></span>*@
                 @Html.Hidden("TripId", Model.TripId)
-            </div>
-            <div class="form-group">
-                <label asp-for="Cost" class="control-label"></label>
-                <input asp-for="@Model.Cost" class="form-control" />
-                <span asp-validation-for="Cost" class="text-danger"></span>
 
-                
+
             </div>
+            @if (ViewBag.HotelRequired == true)
+            {
+
+                <div class="form-group">
+                    <label asp-for="HotelName" class="control-label"></label>
+                    <input asp-for="@Model.HotelName" class="form-control" />
+                    <span asp-validation-for="HotelName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Cost" class="control-label"></label>
+                    <input asp-for="@Model.Cost" class="form-control" />
+                    <span asp-validation-for="Cost" class="text-danger"></span>
+                </div>
+
+            }
             <div class="form-group">
                 <label asp-for="Start" class="control-label"></label>
                 <input asp-for='@Model.Start' class="form-control" />
@@ -33,7 +52,7 @@
                 <span asp-validation-for="End" class="text-danger"></span>
             </div>
             <div class="form-group">
-                @Html.Hidden("FlightTicketStatus", 2)
+                @Html.Hidden("AccomodationStatus", 2)
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
@@ -41,6 +60,7 @@
         </form>
     </div>
 </div>
+
 
 <div>
     <a asp-action="Details" asp-controller="Trip" asp-route-id="@Model.TripId">Back to trip</a>
