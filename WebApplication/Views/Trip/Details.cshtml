@@ -54,7 +54,7 @@
 
 
         <dt>
-            Flight tickets:
+            Flight tickets
         </dt>
         <dd>
             @ViewBag.FlightTicketStatus
@@ -65,11 +65,54 @@
                 @*@Html.ActionLink("Add flight", "Create", "FlightInformationController")*@
                 <a asp-controller="FlightInformation" asp-action="Create" asp-route-id="@Model.Id">Add/Change flight</a>
             </dd>
+        }
+        @if (ViewBag.FlightTicketStatus == Application.Entities.TicketStatusEnum.Booked)
+        {
             <dd>
                 <a asp-controller="FlightInformation" asp-action="Details" asp-route-id="@Model.Id">Show flight Info</a>
             </dd>
         }
-    </dl>
+            <dt>
+                Rental car
+            </dt>
+            <dd>
+                @ViewBag.CarRental
+            </dd>
+            @if (ViewBag.CarRental != Application.Entities.CarRentalEnum.NotRequired)
+            {
+                <dd>
+
+                    <a asp-controller="RentalCarInformation" asp-action="Create" asp-route-id="@Model.Id">Add/Change rental car</a>
+
+                </dd>
+            }
+            @if (ViewBag.CarReantal == Application.Entities.CarRentalEnum.Booked)
+            {
+                <dd>
+                    <a asp-controller="RentalCarInformation" asp-action="Details" asp-route-id="@Model.Id">Show rental car Info</a>
+                </dd>
+            }
+            <dt>
+                Accomodation
+            </dt>
+            <dd>
+                @ViewBag.AccomodationStatus @*TODO - change to accomodation status*@
+            </dd>
+            
+            @if (ViewBag.AccomodationStatus != Application.Entities.AccomodationStatusEnum.NotRequired)
+            {
+            <dd>
+                @*@Html.ActionLink("Add flight", "Create", "FlightInformationController")*@
+                <a asp-controller="Accomodation" asp-action="Create" asp-route-id="@Model.Id">Add/Change Accomodation information</a>
+            </dd>
+            }
+            @if (ViewBag.AccomodationStatus == Application.Entities.AccomodationStatusEnum.Booked)
+            {
+                <dd>
+                    <a asp-controller="Accomodation" asp-action="Details" asp-route-id="@Model.Id">Show Accomodation information</a>
+                </dd>
+            }
+        </dl>
 </div>
 <div>
     <table class="table">

@@ -95,6 +95,8 @@ namespace WebApplication.Controllers
             }
 
             var flight = await _context.FlightInformation.FirstOrDefaultAsync(f => f.TripId == id);
+            var carRental = await _context.RentalCarInformation.FirstOrDefaultAsync(r => r.TripId == id);
+            var accomodationInfo = await _context.AccomodationInfo.FirstOrDefaultAsync(a => a.TripId == id);
 
             var trip = await _context.Trip.FirstOrDefaultAsync(m => m.Id == id);
             if (trip == null)
@@ -115,11 +117,20 @@ namespace WebApplication.Controllers
                 }
             }
             ViewBag.Participators=list3;
-            ViewBag.FlightId = flight.Id;
+            //ViewBag.FlightId = flight.Id;
             ViewBag.FlightTicketStatus = flight.FlightTicketStatus;
 
-            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
+
+            //ViewBag.CarRentalId = carRental.Id;
+            ViewBag.CarRental = carRental.CarRental;
+
+            ViewBag.AccomodationStatus = accomodationInfo.AccomodationStatus;
+
+            if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { 
+            return View(trip); 
+            }
             else { return View("_NotFound"); }
+
         }
 
         // GET: Trip/Create
@@ -131,6 +142,8 @@ namespace WebApplication.Controllers
                          select ofc.Text;
             ViewBag.Offices = values;
             ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired};
+            ViewBag.carRental = new List<CarRentalEnum>() { CarRentalEnum.Required, CarRentalEnum.NotRequired };
+            ViewBag.AccomodationStatus = new List<AccomodationStatusEnum> { AccomodationStatusEnum.Required, AccomodationStatusEnum.NotRequired };
             ViewBag.Error = error;
             if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer)
             { return View(); }
@@ -142,7 +155,7 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip, TicketStatusEnum ticketStatus)
+        public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip, TicketStatusEnum ticketStatus, CarRentalEnum carRental, AccomodationStatusEnum accomodationStatus)
         {
             var office1 = _context.Office.SingleOrDefault(x => x.Name == officeTitle1);
             var office2 = _context.Office.SingleOrDefault(x => x.Name == officeTitle2);
@@ -175,18 +188,23 @@ namespace WebApplication.Controllers
                 }
                 i1 = i;
 
-              
-                trip.Participators.Add(participator);
-                //_context.Add(participator);
-
             }
             if (!_ts.IsTripParticipatorsBusy(trip))
             {
                 _context.Add(trip);
                 _context.SaveChanges();
 
+                foreach(TripParticipator tripParticipator in trip.Participators)
+                {
+                    var accomodationInfo = new AccomodationInfo() { TripId = trip.Id, UserId = tripParticipator.UserId, Start = DateTime.MinValue, End = DateTime.MinValue, AccomodationStatus = accomodationStatus };
+                    _context.Add(accomodationInfo);
+                }
+
                 var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
                 _context.Add(flightInfo);
+                var rentalCarinfo = new RentalCarInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, CarRental = carRental };
+                _context.Add(rentalCarinfo);
+
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
@@ -300,7 +318,19 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var trip = await _context.Trip.FindAsync(id);
+            var flightInformation = _context.FlightInformation.Single(f => f.TripId == id);
+            var rentalCarInformation = _context.RentalCarInformation.Single(r => r.TripId == id);
+            var accomodationInfo = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
+
             _context.Trip.Remove(trip);
+            _context.FlightInformation.Remove(flightInformation);
+            _context.RentalCarInformation.Remove(rentalCarInformation);
+
+            foreach( AccomodationInfo accomodation in accomodationInfo)
+            {
+                _context.AccomodationInfo.Remove(accomodation);
+            }
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -320,8 +350,6 @@ namespace WebApplication.Controllers
                 var v = _context.FlightInformation.Where(a => a.TripId == flightInformation.TripId).FirstOrDefault();
                 if (v != null)
                 {
-
-                    //v.Id = flightInformation.Id;
                     v.Id = v.Id;
                     v.TripId = flightInformation.TripId;
                     v.Cost = flightInformation.Cost;
