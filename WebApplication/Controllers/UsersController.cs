@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Filters;
+using WebApplication.Interceptors;
 
 namespace Application.Controllers
 {
@@ -57,6 +58,7 @@ namespace Application.Controllers
                 return View("_NotFound");
             }
         }
+        [ServiceFilter(typeof(LoggedInterceptor))]
         public IActionResult Home()
         {
             var user = _us.GetUserFromRequest(Request);

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Application.Entities;
+using WebApplication.Interceptors;
 
 namespace WebApplication
 {
@@ -32,6 +33,8 @@ namespace WebApplication
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AppDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITripService, TripService>();
+            services.AddScoped<ILogService, LogService>();
+            services.AddScoped<LoggedInterceptor>();
 
             services.AddAuthentication(option => {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
