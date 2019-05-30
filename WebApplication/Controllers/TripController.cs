@@ -157,60 +157,72 @@ namespace WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(string officeTitle1, string officeTitle2, Trip trip, TicketStatusEnum ticketStatus, CarRentalEnum carRental, AccomodationStatusEnum accomodationStatus)
         {
-            var office1 = _context.Office.SingleOrDefault(x => x.Name == officeTitle1);
-            var office2 = _context.Office.SingleOrDefault(x => x.Name == officeTitle2);
-            trip.ToOffice = office2.Id;
-            trip.FromOffice = office1.Id;
-            trip.TripStatus = 0;
-
-            user = _us.GetUserFromRequest(Request);
-            trip.Organizator = user.Id;
-            _context.Add(trip);
-            //await _context.SaveChangesAsync();
-            Console.WriteLine(trip.Id);
-
-
-            trip.Participators = new List<TripParticipator>();
-            int i1 = 0;
-            if (list == null || list.Count() == 0)
+            using (var transaction = _context.Database.BeginTransaction())
             {
-                return RedirectToAction(nameof(Create), new { error = "Kelionėje turi dalyvauti bent vienas dalyvis" });
-            }
-            list = list.Distinct().ToList();
-            foreach (int i in list)
-            {
-                TripParticipator participator = new TripParticipator();
-                participator.TripId = trip.Id;
-                participator.UserId = i;
-                participator.Approve = false;
-                if (i1 != i) {
-                    trip.Participators.Add(participator);
-                }
-                i1 = i;
-
-            }
-            if (!_ts.IsTripParticipatorsBusy(trip))
-            {
-                _context.Add(trip);
-                _context.SaveChanges();
-
-                foreach(TripParticipator tripParticipator in trip.Participators)
+                try
                 {
-                    var accomodationInfo = new AccomodationInfo() { TripId = trip.Id, UserId = tripParticipator.UserId, Start = DateTime.MinValue, End = DateTime.MinValue, AccomodationStatus = accomodationStatus };
-                    _context.Add(accomodationInfo);
+                    var office1 = _context.Office.SingleOrDefault(x => x.Name == officeTitle1);
+                    var office2 = _context.Office.SingleOrDefault(x => x.Name == officeTitle2);
+                    trip.ToOffice = office2.Id;
+                    trip.FromOffice = office1.Id;
+                    trip.TripStatus = 0;
+
+                    user = _us.GetUserFromRequest(Request);
+                    trip.Organizator = user.Id;
+                    _context.Add(trip);
+                    //await _context.SaveChangesAsync();
+                    Console.WriteLine(trip.Id);
+
+
+                    trip.Participators = new List<TripParticipator>();
+                    int i1 = 0;
+                    if (list == null || list.Count() == 0)
+                    {
+                        return RedirectToAction(nameof(Create), new { error = "Kelionėje turi dalyvauti bent vienas dalyvis" });
+                    }
+                    list = list.Distinct().ToList();
+                    foreach (int i in list)
+                    {
+                        TripParticipator participator = new TripParticipator();
+                        participator.TripId = trip.Id;
+                        participator.UserId = i;
+                        participator.Approve = false;
+                        if (i1 != i)
+                        {
+                            trip.Participators.Add(participator);
+                        }
+                        i1 = i;
+
+                    }
+                    if (!_ts.IsTripParticipatorsBusy(trip))
+                    {
+                        _context.Add(trip);
+                        _context.SaveChanges();
+
+                        foreach (TripParticipator tripParticipator in trip.Participators)
+                        {
+                            var accomodationInfo = new AccomodationInfo() { TripId = trip.Id, UserId = tripParticipator.UserId, Start = DateTime.MinValue, End = DateTime.MinValue, AccomodationStatus = accomodationStatus };
+                            _context.Add(accomodationInfo);
+                        }
+
+                        var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
+                        _context.Add(flightInfo);
+                        var rentalCarinfo = new RentalCarInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, CarRental = carRental };
+                        _context.Add(rentalCarinfo);
+
+                        _context.SaveChanges();
+                        transaction.Commit();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(Create), new { error = "Pasirinkti dalyiai šiuo laiku užimti" });
+                    }
                 }
-
-                var flightInfo = new FlightInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, FlightTicketStatus = ticketStatus };
-                _context.Add(flightInfo);
-                var rentalCarinfo = new RentalCarInformation() { TripId = trip.Id, Cost = 0, Start = DateTime.MinValue, End = DateTime.MinValue, CarRental = carRental };
-                _context.Add(rentalCarinfo);
-
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction(nameof(Create), new { error = "Pasirinkti dalyiai šiuo laiku užimti"});
+                catch (Exception)
+                {
+                    return NotFound();
+                }
             }
         }
         public string GetOfficeName(int id)
