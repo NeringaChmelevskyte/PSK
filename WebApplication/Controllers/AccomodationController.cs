@@ -51,6 +51,9 @@ namespace WebApplication.Controllers
         }
         public IActionResult DetailsView(int? id)
         {
+            ViewBag.Apartments = _context.Apartment.ToList();
+            ViewBag.Accomodations = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
+            ViewBag.ApartmentRooms = _context.ApartmentRoom.ToList();
             var tmpAccomodationInfo = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
             foreach(AccomodationInfo ai in tmpAccomodationInfo)
             {
