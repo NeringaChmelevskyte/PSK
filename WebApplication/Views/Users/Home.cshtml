@@ -4,70 +4,71 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <h1>Welcome @ViewBag.Name</h1>
-    <h3>Received invites to trips:</h3>
-    <div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Accept Invitation
-                    </th>
-                    <th>
-                        Decline Invitation
-                    </th>
-                    <th>
-                        TripName
-                    </th>
-                    <th>
-                        StartDate
-                    </th>
-                    <th>
-                        EndDate
-                    </th>
-                    <th>
-                        FromOffice
-                    </th>
-                    <th>
-                        ToOffice
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in ViewBag.Trips)
+<text> &nbsp; &nbsp;</text>
+<h3>Received invites to trips:</h3>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Accept Invitation
+                </th>
+                <th>
+                    Decline Invitation
+                </th>
+                <th>
+                    TripName
+                </th>
+                <th>
+                    StartDate
+                </th>
+                <th>
+                    EndDate
+                </th>
+                <th>
+                    FromOffice
+                </th>
+                <th>
+                    ToOffice
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.Trips)
+            {
+                @foreach (var item1 in ViewBag.Offices)
                 {
-                    @foreach (var item1 in ViewBag.Offices)
-                    {
-                        if (item1.Id == item.FromOffice) { ViewData["Name1"] = item1.Name; }
-                        if (item1.Id == item.ToOffice) { ViewData["Name2"] = item1.Name; }
-                    }
-                    <tr>
-                        <td>
-                            <button onclick="accept(@item.Id)">Accept</button>
-                        </td>
-                        <td>
-                            <button onclick="decline(@item.Id)">Decline</button>
-                        </td>
-                        <td>
-                            @item.Title
-                        </td>
-                        <td>
-                            @item.Start
-                        </td>
-                        <td>
-                            @item.End
-                        </td>
-                        <td>
-                            @ViewData["Name1"]
-                        </td>
-                        <td>
-                            @ViewData["Name2"]
-                        </td>
-                    </tr>
+                    if (item1.Id == item.FromOffice) { ViewData["Name1"] = item1.Name; }
+                    if (item1.Id == item.ToOffice) { ViewData["Name2"] = item1.Name; }
                 }
-            </tbody>
-        </table>
-    </div>
-
+                <tr>
+                    <td>
+                        <button onclick="accept(@item.Id)">Accept</button>
+                    </td>
+                    <td>
+                        <button onclick="decline(@item.Id)">Decline</button>
+                    </td>
+                    <td>
+                        @item.Title
+                    </td>
+                    <td>
+                        @item.Start
+                    </td>
+                    <td>
+                        @item.End
+                    </td>
+                    <td>
+                        @ViewData["Name1"]
+                    </td>
+                    <td>
+                        @ViewData["Name2"]
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<text> &nbsp;</text>
 <h3>My Trips:</h3>
 <div>
     <table class="table">

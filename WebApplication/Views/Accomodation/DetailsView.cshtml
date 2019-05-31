@@ -9,7 +9,33 @@
     <h4>Accomodation for selected trip</h4>
     <hr />
     <dl class="dl-horizontal">
+        @{
+            ViewData["ApartmentTitle"] = "";
 
+        }
+
+
+            @foreach (Application.Entities.ApartmentRoom apartmentRoom in ViewBag.ApartmentRooms)
+            {
+                if (apartmentRoom.Id == ViewBag.Accomodation.ApartmentRoomId)
+                {
+                    ViewData["ApartmentRoomNumber"] = apartmentRoom.RoomNumber;
+                    if ((string)ViewData["ApartmentTitle"] == "")
+                    {
+                        foreach (Application.Entities.Apartment apartment in ViewBag.Apartments)
+                        {
+                            if (apartmentRoom.ApartmentId == apartment.Id)
+                            {
+                                ViewData["ApartmentTitle"] = apartment.Title;
+                                break;
+                            }
+
+                        }
+                    }
+                    break;
+                }
+
+            }
         @if (ViewBag.Accomodation.HotelName != null)
         {
             <dt>
@@ -28,10 +54,16 @@
         else
         {
             <dt>
-                ApartmentRoomId
+                Apartment title
             </dt>
             <dd>
-                @ViewBag.Accomodation.ApartmentRoomId
+                @ViewData["ApartmentTitle"]
+            </dd>
+            <dt>
+                Room number
+            </dt>
+            <dd>
+                @ViewData["ApartmentRoomNumber"]
             </dd>
         }
         <dt>
