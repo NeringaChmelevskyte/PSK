@@ -51,6 +51,12 @@ namespace WebApplication.Controllers
 
             return View(tmpFlightInformation);
         }
+        public IActionResult DetailsView(int? id)
+        {
+            var tmpFlightInformation = _context.FlightInformation.FirstOrDefault(f => f.TripId == id);
+
+            return View(tmpFlightInformation);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

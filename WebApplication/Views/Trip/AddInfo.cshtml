@@ -1,0 +1,36 @@
+﻿@model Application.Entities.TripParticipator
+
+@{
+    ViewData["Title"] = "AddInfo";
+}
+
+<h2>AddInfo</h2>
+
+<h4>TripParticipator</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-10">
+        <form asp-action="AddInfo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="TripId" />
+            <div class="form-group">
+                <label asp-for="Info" class="control-label"></label>
+                <input asp-for="Info" class="form-control" />
+                <span asp-validation-for="Info" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

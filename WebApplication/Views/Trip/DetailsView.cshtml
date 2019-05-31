@@ -1,0 +1,124 @@
+﻿@model Application.Entities.Trip
+
+@{
+    ViewData["Title"] = "DetailsView";
+}
+
+<h2>DetailsView</h2>
+
+<div>
+    <h4>Trip</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.End)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.End)
+        </dd>
+        @foreach (var item in ViewBag.offices)
+        {
+            if (item.Id == Model.FromOffice)
+            {
+                <dt>
+                    FromOffice
+                </dt>
+                <dd>
+                    @item.Name
+                </dd>
+            }
+            if (item.Id == Model.ToOffice)
+            {
+                <dt>
+                    FromOffice
+                </dt>
+                <dd>
+                    @item.Name
+                </dd>
+            }
+        }
+        <dt>
+            @Html.DisplayNameFor(model => model.TripStatus)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TripStatus)
+        </dd>
+        @foreach (var item in ViewBag.users)
+        {
+            if (item.Id == Model.Organizator)
+            {
+                <dt>
+                    Organizator
+                </dt>
+                <dd>
+                    @item.Name
+                </dd>
+            }
+        }
+        <dt>
+            Flight tickets
+        </dt>
+        <dd>
+            @ViewBag.FlightTicketStatus
+        </dd>
+        @if (ViewBag.FlightTicketStatus == Application.Entities.TicketStatusEnum.Booked)
+        {
+            <dd>
+                <a asp-controller="FlightInformation" asp-action="DetailsView" asp-route-id="@Model.Id">Show flight Info</a>
+            </dd>
+        }
+        <dt>
+            Rental car
+        </dt>
+        <dd>
+            @ViewBag.CarRental
+        </dd>
+        @if (ViewBag.CarRental == Application.Entities.CarRentalEnum.Booked)
+        {
+            <dd>
+                <a asp-controller="RentalCarInformation" asp-action="DetailsView" asp-route-id="@Model.Id">Show rental car Info</a>
+            </dd>
+        }
+        <dt>
+            Accomodation
+        </dt>
+        <dd>
+            @ViewBag.AccomodationStatus @*TODO - change to accomodation status*@
+        </dd>
+        @if (ViewBag.AccomodationStatus == Application.Entities.AccomodationStatusEnum.Booked)
+        {
+            <dd>
+                <a asp-controller="Accomodation" asp-action="DetailsView" asp-route-id="@Model.Id">Show Accomodation information</a>
+            </dd>
+        }
+        <dt>
+            Additional information
+        </dt>
+    </dl>
+    @foreach (var item in ViewBag.tp)
+    {
+        if (item.UserId == ViewBag.Id && item.TripId == Model.Id)
+        {
+            <div contenteditable="false" id="Text3" name="Text3" style="height:200px;overflow:auto;">
+
+                @item.Info
+
+            </div>
+        }
+    }
+</div>
+<div>
+    <a asp-action="Home" asp-controller="Users" asp-route-id="@Model">Back to Home</a>
+</div>
