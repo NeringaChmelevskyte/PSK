@@ -133,6 +133,9 @@
                 <th>
                     AcceptedInvitation
                 </th>
+                <th>
+                    Add Aditional info to user
+                </th>
                 <th></th>
             </tr>
         </thead>
@@ -143,26 +146,29 @@
                 {
                     if (item1.UserId == item.Id && item1.TripId == Model.Id) { ViewData["Name3"] = item1.Approve; }
                 }
-                <tr>
-                    <td>
-                        @item.Name
-                    </td>
-                    <td>
-                        @item.Surname
-                    </td>
-                    <td>
-                        @item.Email
-                    </td>
-                    <td>
-                        @item.Role
-                    </td>
-                    <td>
-                        @ViewData["Name3"]
-                    </td>
-                    <td>
-                        @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Surname
+                </td>
+                <td>
+                    @item.Email
+                </td>
+                <td>
+                    @item.Role
+                </td>
+                <td>
+                    @ViewData["Name3"]
+                </td>
+                <td>
+                    @Html.ActionLink("User Calendar For Organizer", "ShowEvents", "Events", new { id = item.Id })
+                </td>
+                <td>
+                    @Html.ActionLink("Add aditional info to user", "AddInfo", "Trip", new { id = Model.Id, uid = item.Id })
+                </td>
+            </tr>
             }
         </tbody>
     </table>

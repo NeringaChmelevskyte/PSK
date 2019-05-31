@@ -51,6 +51,12 @@ namespace WebApplication.Controllers
 
             return View(tmpRentalCarInformation);
         }
+        public IActionResult DetailsView(int? id)
+        {
+            var tmpRentalCarInformation = _context.RentalCarInformation.FirstOrDefault(r => r.TripId == id);
+
+            return View(tmpRentalCarInformation);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

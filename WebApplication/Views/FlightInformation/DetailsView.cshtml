@@ -1,0 +1,35 @@
+﻿@model Application.Entities.FlightInformation
+
+@{
+    ViewData["Title"] = "DetailsView";
+}
+
+<h2>DetailsView</h2>
+
+<div>
+    <h4>FlightInformation</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Cost)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Cost)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.End)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.End)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="DetailsView" asp-controller="Trip" asp-route-id="@Model.TripId">Back to trip</a>
+</div>

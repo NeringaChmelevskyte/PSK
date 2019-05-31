@@ -44,6 +44,18 @@ namespace WebApplication.Controllers
             ViewBag.Accomodations = tmpAccomodationInfo;
             return View(id);
         }
+        public IActionResult DetailsView(int? id)
+        {
+            var tmpAccomodationInfo = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
+            foreach(AccomodationInfo ai in tmpAccomodationInfo)
+            {
+                if (user.Id == ai.UserId)
+                {
+                    ViewBag.Accomodation = ai;
+                }
+            }
+            return View(id);
+        }
 
         public IActionResult Create(int id, bool? isHotelRequired, DateTime? start, DateTime? end)
         {

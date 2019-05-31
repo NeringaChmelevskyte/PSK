@@ -19,6 +19,8 @@ namespace WebApplication.Controllers
         private ITripService _ts;
         private User user;
         private static List<int> list;
+        private static int id1;
+        private static int id2;
         public TripController(ApplicationDbContext context, IUserService us, ITripService ts)
         {
             _context = context;
@@ -39,6 +41,7 @@ namespace WebApplication.Controllers
             {
                 ViewBag.Name = user.Name + " " + user.Surname;
                 ViewBag.Role = user.Role;
+                ViewBag.Id = user.Id;
             }
             ViewBag.offices = _context.Office.ToList();
             ViewBag.users = _context.Users.ToList();
@@ -131,6 +134,63 @@ namespace WebApplication.Controllers
             }
             else { return View("_NotFound"); }
 
+        }
+        public async Task<IActionResult> DetailsView(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var flight = await _context.FlightInformation.FirstOrDefaultAsync(f => f.TripId == id);
+            var carRental = await _context.RentalCarInformation.FirstOrDefaultAsync(r => r.TripId == id);
+            var accomodationInfo = await _context.AccomodationInfo.FirstOrDefaultAsync(a => a.TripId == id);
+
+            var trip = await _context.Trip.FirstOrDefaultAsync(m => m.Id == id);
+            if (trip == null)
+            {
+                return NotFound();
+            }
+            //ViewBag.FlightId = flight.Id;
+            ViewBag.FlightTicketStatus = flight.FlightTicketStatus;
+
+
+            //ViewBag.CarRentalId = carRental.Id;
+            ViewBag.CarRental = carRental.CarRental;
+
+            ViewBag.AccomodationStatus = accomodationInfo.AccomodationStatus;
+
+            if (user != null)
+            {
+                return View(trip);
+            }
+            else { return View("_NotFound"); }
+
+        }
+        public async Task<IActionResult> AddInfo(int? id, int? uid)
+        {
+            var tripParticipator = await  _context.TripParticipators.FirstOrDefaultAsync(m => m.TripId == id && m.UserId == uid);
+            ViewBag.id = id;
+            ViewBag.uid = uid;
+            id1 = (int)id;
+            id2 = (int)uid;
+            return View();
+
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddInfo(TripParticipator tp)
+        {
+            var tripParticipator = await _context.TripParticipators.FirstOrDefaultAsync(m => m.TripId == id1 && m.UserId==id2);
+            tripParticipator.Info = tp.Info;
+            _context.Update(tripParticipator);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = id1 });
+        }
+        [HttpPost]
+        public IActionResult Index(string firstName)
+        {
+            return Content($"Hello {firstName}");
         }
 
         // GET: Trip/Create
@@ -300,6 +360,7 @@ namespace WebApplication.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Trip/Delete/5
         public async Task<IActionResult> Delete(int? id)

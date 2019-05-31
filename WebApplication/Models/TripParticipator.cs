@@ -20,5 +20,6 @@ namespace Application.Entities
         public Trip Trip { get; set; }
 
         public bool Approve{ get; set; }
+        public string Info { get; set; }
     }
 }

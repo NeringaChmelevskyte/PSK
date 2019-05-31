@@ -1,0 +1,53 @@
+﻿@model Int32
+
+@{
+    ViewData["Title"] = "DetailsView";
+}
+
+<h2>DetailsView</h2>
+<div>
+    <h4>Accomodation for selected trip</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        @if (ViewBag.Accomodation.HotelName != null)
+        {
+            <dt>
+                Hotel name
+            </dt>
+            <dd>
+                @ViewBag.Accomodation.HotelName
+            </dd>
+            <dt>
+                Cost
+            </dt>
+            <dd>
+                @ViewBag.Accomodation.Cost
+            </dd>
+        }
+        else
+        {
+            <dt>
+                ApartmentRoomId
+            </dt>
+            <dd>
+                @ViewBag.Accomodation.ApartmentRoomId
+            </dd>
+        }
+        <dt>
+            Start
+        </dt>
+        <dd>
+            @ViewBag.Accomodation.Start
+        </dd>
+        <dt>
+            End
+        </dt>
+        <dd>
+            @ViewBag.Accomodation.End
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="DetailsView" asp-controller="Trip" asp-route-id="@Model">Back to trip</a>
+</div>

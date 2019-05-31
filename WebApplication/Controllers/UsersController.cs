@@ -70,11 +70,13 @@ namespace Application.Controllers
                 var trips = _us.GetAllTrips();
                 var tpList = _us.GetAllTripParticipators();
                 var list = tpList.Where(x => x.UserId == user.Id && x.Approve == false);
+                var listT = tpList.Where(x => x.UserId == user.Id && x.Approve == true);
                 foreach (TripParticipator tp in tpList)
                 {
                     Console.WriteLine(tp.UserId + "  :  " + tp.TripId);
                 }
                 List<Trip> list1 = new List<Trip>();
+                List<Trip> list2 = new List<Trip>();
                 foreach (TripParticipator tp in list)
                 {
                     foreach (Trip t in trips)
@@ -86,7 +88,19 @@ namespace Application.Controllers
                     }
 
                 }
+                foreach (TripParticipator tp in listT)
+                {
+                    foreach (Trip t in trips)
+                    {
+                        if (tp.TripId == t.Id)
+                        {
+                            list2.Add(t);
+                        }
+                    }
+
+                }
                 ViewBag.Trips = list1;
+                ViewBag.Trips2 = list2;
                 var users = Get();
                 return View(users);
             }
