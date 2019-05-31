@@ -19,8 +19,11 @@
                 <label asp-for="Cost" class="control-label"></label>
                 <input asp-for="@Model.Cost" class="form-control" />
                 <span asp-validation-for="Cost" class="text-danger"></span>
-
-                
+            </div>
+            <div class="form-group">
+                <label asp-for="Details" class="control-label"></label>
+                <input asp-for='@Model.Details' class="form-control" />
+                <span asp-validation-for="Details" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Start" class="control-label"></label>

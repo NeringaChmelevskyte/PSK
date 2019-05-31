@@ -25,6 +25,8 @@ namespace Application.Entities
         [Required]
         public Single Cost { get; set; }
 
+        public string Details { get; set; }
+
         [Required]
         public DateTime Start { get; set; }
 
