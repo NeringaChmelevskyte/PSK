@@ -39,7 +39,11 @@
                     <input asp-for="@Model.Cost" class="form-control" />
                     <span asp-validation-for="Cost" class="text-danger"></span>
                 </div>
-
+            }
+            else
+            {
+                @Html.Hidden("HotelName", "")
+                @Html.Hidden("Cost", 0)
             }
             <div class="form-group">
                 <label asp-for="Start" class="control-label"></label>

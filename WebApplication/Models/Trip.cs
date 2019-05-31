@@ -35,7 +35,6 @@ namespace Application.Entities
 
         [Required]
         public DateTime End { get; set; }
-
         [Required]
         //[ForeignKey("Office")]
         [DisplayName("From office")]

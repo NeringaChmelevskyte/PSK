@@ -7,6 +7,7 @@ using Application.Entities;
 using Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebApplication.Controllers
 {
@@ -40,8 +41,12 @@ namespace WebApplication.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var tmpAccomodationInfo = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
-            ViewBag.Accomodations = tmpAccomodationInfo;
+            ViewBag.Users = _context.Users.ToList();
+            ViewBag.Apartments = _context.Apartment.ToList();
+            ViewBag.Accomodations = _context.AccomodationInfo.Where(a => a.TripId == id).ToList();
+            ViewBag.ApartmentRooms = _context.ApartmentRoom.ToList();
+
+            
             return View(id);
         }
 
@@ -53,6 +58,12 @@ namespace WebApplication.Controllers
                 tmpAccomodationInfo.Start = (DateTime)start;
                 tmpAccomodationInfo.End = (DateTime)end;
             }
+            if (isHotelRequired == false)
+            {
+                tmpAccomodationInfo.HotelName = null;
+                tmpAccomodationInfo.Cost = 0;
+            }
+
             ViewBag.HotelRequired = isHotelRequired;
             return View(tmpAccomodationInfo);
         }
@@ -116,6 +127,8 @@ namespace WebApplication.Controllers
                 accomodation.TripId = trip.Id;
                 accomodation.UserId = tripParticipator.UserId;
                 accomodation.ApartmentRoomId = apRoom.Id;
+                accomodation.HotelName = null;
+                accomodation.Cost = 0;
                 accomodation.Start = accomodationInfo.Start;
                 accomodation.End = accomodationInfo.End;
                 accomodation.AccomodationStatus = AccomodationStatusEnum.Booked;

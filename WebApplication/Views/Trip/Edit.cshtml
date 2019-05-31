@@ -45,6 +45,15 @@
             <div>
                 <label class="control-label">Flight tickets status</label>
                 @Html.DropDownList("ticketStatus", new SelectList(ViewBag.FlightTicketStatus, ViewBag.DefaultFlightTicketStatus))
+                @*@Html.DropDownList("ticketStatus", new SelectList(ViewBag.FlightTicketStatus, ViewBag.DefaultFlightTicketStatus))*@
+            </div>
+            <div>
+                <label class="control-label">Rental car status</label>
+                @Html.DropDownList("rentalCarStatus", new SelectList(ViewBag.RentalCarStatus, ViewBag.DefaultRentalCarStatus))
+            </div>
+            <div>
+                <label class="control-label">Accomodation status</label>
+                @Html.DropDownList("accomodationStatus", new SelectList(ViewBag.AccomodationStatus, ViewBag.DefaultAccomodationStatus))
             </div>
             @Html.HiddenFor(model => model.Version)
             <div class="form-group">

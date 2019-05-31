@@ -255,9 +255,15 @@ namespace WebApplication.Controllers
             var offices = OfficeList();
             var values = from ofc in offices
                          select ofc.Text;
+            
             ViewBag.Offices = values;
-            ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired };
-            ViewBag.DefaultFlightTicketStatus = _context.FlightInformation.Single(a => a.TripId == trip.Id).FlightTicketStatus;
+            ViewBag.FlightTicketStatus = new List<TicketStatusEnum>() { TicketStatusEnum.Required, TicketStatusEnum.NotRequired, TicketStatusEnum.Booked };
+            ViewBag.DefaultFlightTicketStatus = _context.FlightInformation.First(a => a.TripId == trip.Id).FlightTicketStatus;
+            ViewBag.RentalCarStatus = new List<CarRentalEnum>() { CarRentalEnum.Required, CarRentalEnum.NotRequired, CarRentalEnum.Booked  };
+            ViewBag.DefaultRentalCarStatus = _context.RentalCarInformation.First(a => a.TripId == trip.Id).CarRental;
+            ViewBag.AccomodationStatus = new List<AccomodationStatusEnum>() { AccomodationStatusEnum.Required, AccomodationStatusEnum.NotRequired, AccomodationStatusEnum.Booked };
+            ViewBag.DefaultAccomodationStatus = _context.AccomodationInfo.First(a => a.TripId == trip.Id).AccomodationStatus;
+            
             var user = _us.GetUserFromRequest(Request);
             if (user != null && ViewBag.Role == Roles.Admin || ViewBag.Role == Roles.Organizer) { return View(trip); }
             else { return View("_NotFound"); }
@@ -268,7 +274,7 @@ namespace WebApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip, TicketStatusEnum ticketStatus)
+        public async Task<IActionResult> Edit(string fromOffice, string toOffice, Trip trip, TicketStatusEnum ticketStatus, CarRentalEnum rentalCarStatus, AccomodationStatusEnum accomodationStatus)
         {
             
                 try
@@ -296,7 +302,21 @@ namespace WebApplication.Controllers
             }
             var flightInfo = _context.FlightInformation.Single(a => a.TripId == trip.Id);
             flightInfo.FlightTicketStatus = ticketStatus;
-            _context.SaveChangesAsync();
+
+            var rentalCar = _context.RentalCarInformation.Single(a => a.TripId == trip.Id);
+            rentalCar.CarRental = rentalCarStatus;
+
+            var accomodationList = _context.AccomodationInfo.Where(a => a.TripId == trip.Id).ToList();
+
+            for(int i =0; i < accomodationList.Count ; i++)
+            {
+                var tempAccomodation = accomodationList[i];
+                tempAccomodation.AccomodationStatus = accomodationStatus;
+            }
+            
+
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -466,9 +486,13 @@ namespace WebApplication.Controllers
                 List<TripParticipator> list2 = _context.TripParticipators.Where(x => x.TripId == i).ToList();
                 var removeTrip = await _context.Trip.FindAsync(i);
 
+                List<AccomodationInfo> accomToDelete = new List<AccomodationInfo>();
+
+                _context.FlightInformation.Remove(_context.FlightInformation.Single(f => f.TripId == i));
+                _context.RentalCarInformation.Remove(_context.RentalCarInformation.Single(r => r.TripId == i));
+
                 foreach (var p in list2)
                 {
-                    
                     TripParticipator tp = new TripParticipator();
                     tp.TripId = trip.Id;
                     tp.Trip = trip;
@@ -479,19 +503,37 @@ namespace WebApplication.Controllers
                     if (trPr == null)
                     {
                         
+                        //var tmpAccom = _context.AccomodationInfo.Single(a => a.TripId == i);
                             participators.Add(p);
-                            _context.Add(tp);                       
+                            _context.Add(tp);
+
+
                     }
-                    
+                    var accomInfo = _context.AccomodationInfo.Single(a => a.TripId == i && a.UserId == p.UserId);
+                    _context.AccomodationInfo.Remove(accomInfo);
                 }
+                
                 _context.Remove(removeTrip);
                 await _context.SaveChangesAsync();
 
             }
-            
-            trip.Participators = participators;
 
-            _context.Add(new FlightInformation { FlightTicketStatus = TicketStatusEnum.NotRequired, TripId = trip.Id});
+            //var accomInfo = _context.AccomodationInfo.Single(a => a.TripId == 7);
+
+            trip.Participators = participators;
+            await _context.SaveChangesAsync();
+
+            int sk = 0;
+            foreach (TripParticipator tp in trip.Participators)
+            {
+                _context.AccomodationInfo.Add(new AccomodationInfo { AccomodationStatus = AccomodationStatusEnum.NotRequired, TripId = tp.TripId, UserId = tp.UserId });
+                if(sk == 0)
+                {
+                    _context.Add(new FlightInformation { FlightTicketStatus = TicketStatusEnum.NotRequired, TripId = trip.Id });
+                    _context.Add(new RentalCarInformation { CarRental = CarRentalEnum.NotRequired, TripId = trip.Id });
+                    sk++;
+                }
+            }
 
             await _context.SaveChangesAsync();
 

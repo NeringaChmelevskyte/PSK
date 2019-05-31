@@ -60,6 +60,7 @@ namespace WebApplication.Controllers
             var tempFlightInformation = _context.FlightInformation.SingleOrDefault(f => f.TripId == flightInformation.TripId);
 
             tempFlightInformation.Start = flightInformation.Start;
+            tempFlightInformation.Details = flightInformation.Details;
             tempFlightInformation.End = flightInformation.End;
             tempFlightInformation.Cost = flightInformation.Cost;
             tempFlightInformation.FlightTicketStatus = flightInformation.FlightTicketStatus;
